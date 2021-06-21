@@ -1,0 +1,7 @@
+# Managing the API with workspaces allows us to run multiple systems in parallel
+[workspace]
+members = [
+    "lib",
+    "graphql_server",
+    "subscriptions_server"
+]

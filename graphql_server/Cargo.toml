@@ -1,0 +1,22 @@
+[package]
+name = "graphql_server"
+version = "0.1.0"
+authors = ["arctic_hen7 <arctic_hen7@pm.me>"]
+edition = "2018"
+default-run = "serverful" # Unless otherwise specified, this crate will use the serverful architecture with Actix rather than the serverless
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+async-graphql-actix-web = "2.8.2"
+async-graphql = "2.8.2"
+actix-web = "3.3.2"
+lib = { path = "../lib" }
+
+[[bin]]
+name = "serverful"
+path = "bin/serverful.rs"
+
+[[bin]]
+name = "serverless"
+path = "bin/serverless.rs"
