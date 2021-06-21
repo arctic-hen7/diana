@@ -24,3 +24,6 @@ start-subscriptions-server = "bonnie dc up -d subscriptions-server"
 stop-subscriptions-server = "bonnie dc stop subscriptions-server"
 attach-subscriptions-server = "bonnie up-subscriptions-server && docker attach $(bonnie getcontainerid diana.subscriptions-server)"
 sh-subscriptions-server = "bonnie dc run --entrypoint \"/bin/zsh\" -p 9002:6000 --use-aliases --rm subscriptions-server"
+
+# Releases the project to GitHub
+release = "standard-version && git push --follow-tags origin main"
