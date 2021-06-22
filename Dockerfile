@@ -51,6 +51,7 @@ COPY ./Cargo.toml Cargo.toml
 COPY ./lib/Cargo.toml lib/Cargo.toml
 COPY ./graphql_server/Cargo.toml graphql_server/Cargo.toml
 COPY ./subscriptions_server/Cargo.toml subscriptions_server/Cargo.toml
+COPY ./dev_utils/Cargo.toml dev_utils/Cargo.toml
 # Vendor all dependencies (stores them all locally, meaning they can be cached)
 RUN mkdir -p /app/.cargo \
     && chown -R node:node /app/.cargo

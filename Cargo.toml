@@ -3,5 +3,6 @@
 members = [
     "lib",
     "graphql_server",
-    "subscriptions_server"
+    "subscriptions_server",
+    "dev_utils" # The DB logic etc. for testing in a realistic way
 ]

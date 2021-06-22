@@ -1,6 +1,6 @@
 use std::fs;
 
-use crate::errors::*;
+use lib::errors::*;
 
 // Loads all necessary environment files with `dotenv`
 pub fn load_env() -> Result<()> {

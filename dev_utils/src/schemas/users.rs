@@ -14,10 +14,12 @@ use mongodb::{
 use async_stream::stream;
 
 // Note that we don't use `error_chain` here, just the GraphQL errors system
-use crate::errors::{GQLResult, GQLError};
-use crate::graphql_utils::{get_client_from_ctx, get_stream_for_channel_from_ctx};
+use lib::errors::{GQLResult, GQLError};
+use lib::graphql_utils::get_stream_for_channel_from_ctx;
+use lib::Publisher;
+
+use crate::ctx::get_client_from_ctx;
 use crate::oid::ObjectId;
-use crate::pubsub::Publisher;
 
 #[derive(Serialize, Deserialize, Debug, GQLSimpleObject)]
 pub struct User {

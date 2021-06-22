@@ -900,6 +900,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "dev_utils"
+version = "0.1.0"
+dependencies = [
+ "async-graphql",
+ "async-stream",
+ "dotenv",
+ "futures",
+ "lib",
+ "mongodb",
+ "serde",
+ "serde_json",
+ "tokio 0.2.25",
+]
+
+[[package]]
 name = "digest"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1193,6 +1208,7 @@ dependencies = [
  "actix-web",
  "async-graphql",
  "async-graphql-actix-web",
+ "dev_utils",
  "lib",
 ]
 
@@ -2582,6 +2598,7 @@ dependencies = [
  "actix-web",
  "async-graphql",
  "async-graphql-actix-web",
+ "dev_utils",
  "lib",
 ]
 

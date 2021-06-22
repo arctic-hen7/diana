@@ -1,11 +1,9 @@
 // Utility functions for GraphQL resolvers
 use std::sync::{Mutex, MutexGuard};
-use mongodb::Client as MongoClient;
 use tokio::stream::Stream;
 
 use crate::pubsub::PubSub;
 use crate::auth::auth_state::AuthState;
-use crate::db::DbPool;
 use crate::errors::*;
 
 // Checks to see if the given authentication state matches the series of given claims
@@ -30,22 +28,6 @@ macro_rules! if_authed(
         }
      };
 );
-
-// We make an instance of the database client accessible to all GraphQL resolvers through context
-#[derive(Clone)]
-pub struct Context {
-    pub pool: DbPool, // This needs to be public so that schema files can use it
-}
-
-// A utility function to get a client from the given context object
-pub fn get_client_from_ctx(raw_ctx: &async_graphql::Context<'_>) -> Result<MongoClient> {
-    // Extract our context from the broader `async_graphql` context
-    let ctx = raw_ctx.data::<Context>()
-        .map_err(|_err| ErrorKind::GraphQLContextNotFound("main context".to_string()))?;
-    let client = ctx.pool.get_client()?;
-
-    Ok(client)
-}
 
 // A helper function to subscribe to events sent to the subscriptions server on a particular channel
 // This returns a pre-created stream which you should manipulate if necessary (e.g. to serialise data)

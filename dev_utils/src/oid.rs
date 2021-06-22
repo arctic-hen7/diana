@@ -15,7 +15,7 @@ use mongodb::{
     results::InsertOneResult
 };
 
-use crate::errors::*;
+use lib::errors::*;
 
 // A custom GraphQL scalar type for MongoDB object ids (like `_id`)
 #[derive(Debug, Serialize, Deserialize)]
