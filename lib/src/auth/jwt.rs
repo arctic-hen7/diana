@@ -1,4 +1,3 @@
-use std::env;
 use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
 use jsonwebtoken::{encode, Algorithm, Header, EncodingKey, decode, DecodingKey, Validation};
@@ -22,15 +21,9 @@ pub struct JWTSecret<'a> {
 }
 
 // A function to get a JWT secret from a given string for both encoding and decoding
-// Defaults to the environment variable `JWT_SECRET`
-pub fn get_jwt_secret(secret_str: Option<&str>) -> Result<JWTSecret> {
-    let secret = match secret_str {
-        Some(secret) => secret.to_string(),
-        None => env::var("JWT_SECRET")?
-    };
-
-    let encoding_key = EncodingKey::from_base64_secret(&secret)?;
-    let decoding_key = DecodingKey::from_base64_secret(&secret)?;
+pub fn get_jwt_secret<'a>(secret_str: String) -> Result<JWTSecret<'a>> {
+    let encoding_key = EncodingKey::from_base64_secret(&secret_str)?;
+    let decoding_key = DecodingKey::from_base64_secret(&secret_str)?;
 
     Ok(
         JWTSecret {

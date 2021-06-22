@@ -19,8 +19,9 @@ use crate::errors::*;
 use crate::auth::jwt::{get_jwt_secret, validate_and_decode_jwt};
 use crate::auth::auth_state::{AuthState, AuthToken};
 
-// Extracts an authentication state from the token
-fn get_token_state_from_req(req: &ServiceRequest) -> Result<AuthState> {
+// Extracts an authentication state from the given request
+// Needs a JWT secret to validate the client's token
+fn get_token_state_from_req(req: &ServiceRequest, secret_str: String) -> Result<AuthState> {
     // Get the authorisation header from the request
     let raw_auth_header = req
                             .headers()
@@ -48,7 +49,7 @@ fn get_token_state_from_req(req: &ServiceRequest) -> Result<AuthState> {
     // Decode the bearer token into an authentication state
     match bearer_token {
         Some(token) => {
-            let jwt_secret = get_jwt_secret(None)?; // We'll use the environment variable
+            let jwt_secret = get_jwt_secret(secret_str)?;
             let decoded_jwt = validate_and_decode_jwt(&token, &jwt_secret);
 
             match decoded_jwt {
@@ -64,32 +65,39 @@ fn get_token_state_from_req(req: &ServiceRequest) -> Result<AuthState> {
 
 // The block state chosen may have unforseen security implications, please choose wisely!
 #[derive(Debug, Clone, Copy)]
-enum AuthCheckBlockState {
+pub enum AuthCheckBlockState {
     AllowAll, // Allows anything through, adding the auth parameters to the request for later processing
     BlockUnauthenticated, // Blocks missing/invalid tokens (all requests must be authenticated)
     AllowMissing // Only block if an invalid token is given (if no token, allowed)
 }
 
 // Create a factory for authentication middleware
+#[derive(Clone)]
 pub struct AuthCheck {
+    token_secret: String,
     block_state: AuthCheckBlockState // This defines whether or not we should block requests without a token or with an invalid one
 }
 impl AuthCheck {
+    // Initialises a new instance of the authentication middleware factory
+    // Needs a JWT to validate client tokens
+    pub fn new(token_secret: &str) -> Self {
+        Self {
+            token_secret: token_secret.to_string(),
+            block_state: AuthCheckBlockState::BlockUnauthenticated // We block by default
+        }
+    }
     // These functions allow us to initialise the middleware factory (and thus the middleware itself) with custom options
-    pub fn block_unauthenticated() -> Self {
-        Self {
-            block_state: AuthCheckBlockState::BlockUnauthenticated, // We block by default
-        }
+    pub fn block_unauthenticated(mut self) -> Self {
+        self.block_state = AuthCheckBlockState::BlockUnauthenticated;
+        self
     }
-    pub fn allow_missing() -> Self {
-        Self {
-            block_state: AuthCheckBlockState::AllowMissing,
-        }
+    pub fn allow_missing(mut self) -> Self {
+        self.block_state = AuthCheckBlockState::AllowMissing;
+        self
     }
-    pub fn allow_all() -> Self {
-        Self {
-            block_state: AuthCheckBlockState::AllowAll
-        }
+    pub fn allow_all(mut self) -> Self {
+        self.block_state = AuthCheckBlockState::AllowAll;
+        self
     }
 }
 
@@ -109,14 +117,20 @@ where
     type Future = Ready<StdResult<Self::Transform, Self::InitError>>;
 
     // This will be called internally by Actix Web to create our middleware
-    // All this really does is pass the service itself (handler basically) over to our middleware
+    // All this really does is pass the service itself (handler basically) over to our middleware (along with additional metadata)
     fn new_transform(&self, service: S) -> Self::Future {
-        ok(AuthCheckMiddleware { service, block_state: self.block_state })
+        ok(AuthCheckMiddleware {
+            token_secret: self.token_secret.clone(),
+            service,
+            block_state: self.block_state
+        })
     }
 }
 
 // The actual middleware
+#[derive(Clone)]
 pub struct AuthCheckMiddleware<S> {
+    token_secret: String, // The JWT secret as a string to validate client tokens
     service: S,
     block_state: AuthCheckBlockState // This will be passed in from whatever is set for the factory
 }
@@ -140,7 +154,7 @@ where
 
     fn call(&mut self, req: ServiceRequest) -> Self::Future {
         // Check the token
-        let token_state = get_token_state_from_req(&req);
+        let token_state = get_token_state_from_req(&req, self.token_secret.clone());
         match token_state {
             // We hold `token_state` as the AuthState variant so we don't pointlessly insert a Result into the request extensions
             Ok(token_state @ AuthState::Authorised(_)) => {

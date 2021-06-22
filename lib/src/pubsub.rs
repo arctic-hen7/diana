@@ -1,7 +1,6 @@
 // This module defines a simple publish-subscribe structure, though one designed to run across the web
 // The publishing and subscribing are done on different servers/functions
 
-use std::env;
 use std::collections::HashMap;
 use tokio_stream::Stream;
 use async_stream::stream;
@@ -10,7 +9,6 @@ use reqwest::Client;
 use serde::{Serialize, Deserialize};
 
 use crate::errors::*;
-use crate::load_env;
 
 const MESSAGES_TO_BE_RETAINED: usize = 5;
 
@@ -35,25 +33,7 @@ pub struct Publisher {
     token: String
 }
 impl Publisher {
-    pub fn new(port: Option<String>, hostname: Option<String>, endpoint: Option<String>, token: Option<String>) -> Result<Self> {
-        load_env()?;
-        let hostname = match hostname {
-            Some(hostname) => hostname,
-            None => env::var("SUBSCRIPTIONS_SERVER_HOSTNAME")?
-        };
-        let port = match port {
-            Some(port) => port,
-            None => env::var("SUBSCRIPTIONS_SERVER_PORT")?
-        };
-        let endpoint = match endpoint {
-            Some(endpoint) => endpoint,
-            None => "graphql".to_string()
-        };
-        let token = match token {
-            Some(token) => token,
-            None => env::var("SUBSCRIPTIONS_SERVER_PUBLISH_JWT")?
-        };
-
+    pub fn new(port: String, hostname: String, endpoint: String, token: String) -> Result<Self> {
         let address = format!(
             "{hostname}:{port}/{endpoint}",
             hostname=hostname,
@@ -127,13 +107,14 @@ pub struct PubSub {
         String, Sender<String>
     >
 }
-impl PubSub {
-    pub fn new() -> Self {
-        PubSub {
+impl Default for PubSub {
+    fn default() -> Self {
+        Self {
             channels: HashMap::new()
         }
     }
-
+}
+impl PubSub {
     // Gets a channel or creates a new one if needed
     fn get_channel(&mut self, channel: &str) -> Sender<String> {
         let channel_sender = self.channels.get(channel);

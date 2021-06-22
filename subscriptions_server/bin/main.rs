@@ -38,7 +38,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .data(schema.clone())
-            .data(Mutex::new(PubSub::new()))
+            .data(Mutex::new(PubSub::default()))
             .service(web::resource(GRAPHQL_ENDPOINT)
                 .guard(guard::Post())
                 .wrap(AuthCheck::block_unauthenticated())

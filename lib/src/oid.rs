@@ -5,7 +5,6 @@ use async_graphql::{
     Value as GQLValue,
     InputValueResult,
     InputValueError,
-    Error as GQLError
 };
 use mongodb::{
     bson::{
@@ -49,8 +48,6 @@ impl ObjectId {
     // Creates a document so we can search by `_id` just after an insertion (insert then return what was inserted)
     // This needs the result of an `insert_one` operation (loop through and create that if you'ure using `insert_many`)
     pub fn find_clause_from_insertion_res(insertion_res: InsertOneResult) -> Result<Document> {
-        let oid_err = GQLError::new(String::from("Inserted object id couldn't be serialized as ObjectId"));
-
         let oid = Self::from_oid(
             insertion_res.inserted_id.as_object_id().ok_or(
                 ErrorKind::OidSerializationFailed

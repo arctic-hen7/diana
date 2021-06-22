@@ -40,7 +40,7 @@ fn get_users(client: MongoClient) -> Collection<User> {
 }
 
 // Register Query methods
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Query {}
 #[GQLObject]
 impl Query {
@@ -59,7 +59,7 @@ impl Query {
 }
 
 // Register Mutation methods
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Mutation {}
 #[GQLObject]
 impl Mutation {
@@ -86,7 +86,7 @@ impl Mutation {
 }
 
 // Register Subscription methods
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Subscription;
 #[GQLSubscription]
 impl Subscription {

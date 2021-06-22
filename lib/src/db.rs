@@ -41,11 +41,9 @@ pub fn get_client() -> Result<MongoClient> {
 // The MongoDB crate handles pooling internally, so we don't have to worry about it here
 // We just need a struct that exposes methods to get a client
 // If extra pooling logic ever needs to be added, it can be done from here
+#[derive(Clone, Default)]
 pub struct DbPool {}
 impl DbPool {
-    pub fn new() -> Self {
-        Self {}
-    }
     pub fn get_client(&self) -> Result<MongoClient> {
         // Check if we already have a client cached
         let client = get_client()?;

@@ -32,6 +32,7 @@ macro_rules! if_authed(
 );
 
 // We make an instance of the database client accessible to all GraphQL resolvers through context
+#[derive(Clone)]
 pub struct Context {
     pub pool: DbPool, // This needs to be public so that schema files can use it
 }

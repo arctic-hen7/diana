@@ -63,6 +63,11 @@ error_chain! {
             description("unauthorised access attempt")
             display("unable to comply with request due to lack of valid and sufficient authentication")
         }
+
+        IncompleteBuilderFields {
+            description("not all required builder fields were instantiated")
+            display("some required builder fields haven't been instantiated")
+        }
     }
     // We work with many external libraries, all of which have their own errors
     foreign_links {
