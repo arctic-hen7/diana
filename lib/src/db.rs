@@ -5,7 +5,7 @@ use mongodb::{
 };
 
 use crate::errors::*;
-use crate::load_env;
+use crate::load_env::load_env;
 
 // A helper function for implementations of the DbClient trait that gets a handle to a DB client from environment variables
 // All errors are given in GraphQL format, seeing as this function will be called in resolver logic and conversion is annoying

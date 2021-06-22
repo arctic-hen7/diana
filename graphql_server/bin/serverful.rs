@@ -2,17 +2,20 @@
 // This binary runs a serverful setup with Actix Web, as opposed to a serverless approach (TODO)
 // Even so, this system does NOT support subscriptions so we maintain the separity in development that will be present in production
 
-use actix_web::{App, HttpServer};
+use std::env;
 use lib::{
     schemas::users::{Query, Mutation, Subscription},
     graphql_utils::Context,
     db::DbPool,
+    load_env::load_env,
 
+    App, HttpServer,
     create_graphql_server, OptionsBuilder, AuthCheckBlockState
 };
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    load_env().expect("Failed env.");
     let opts = OptionsBuilder::new()
                     .ctx(Context {
                         pool: DbPool::default()
@@ -20,9 +23,9 @@ async fn main() -> std::io::Result<()> {
                     .subscriptions_server_hostname("http://subscriptions-server")
                     .subscriptions_server_port("6000")
                     .subscriptions_server_endpoint("/graphql")
-                    .jwt_to_connect_to_subscriptions_server("invalidtoken")
+                    .jwt_to_connect_to_subscriptions_server(&env::var("SUBSCRIPTIONS_SERVER_PUBLISH_JWT").unwrap())
                     .auth_block_state(AuthCheckBlockState::AllowAll)
-                    .jwt_secret("aninsecuresecret")
+                    .jwt_secret(&env::var("JWT_SECRET").unwrap())
                     .schema(Query {}, Mutation {}, Subscription {})
                     // Endpoints are set up as `/graphql` and `/graphiql` automatically
                     .finish().expect("Options building failed!");

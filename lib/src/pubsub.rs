@@ -33,9 +33,9 @@ pub struct Publisher {
     token: String
 }
 impl Publisher {
-    pub fn new(port: String, hostname: String, endpoint: String, token: String) -> Result<Self> {
+    pub fn new(hostname: String, port: String, endpoint: String, token: String) -> Result<Self> {
         let address = format!(
-            "{hostname}:{port}/{endpoint}",
+            "{hostname}:{port}{endpoint}", // The endpoint should start with '/'
             hostname=hostname,
             port=port,
             endpoint=endpoint
