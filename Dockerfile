@@ -36,6 +36,9 @@ FROM rust-setup AS dependencies
 # Install system dependencies
 USER root
 RUN apk add --no-cache openssl-dev
+# Install global dependencies with NPM
+# See https://answers.netlify.com/t/netlify-cli-fails-to-install/34508/3 for why we use `--unsafe-perm`
+RUN npm install -g --unsafe-perm netlify-cli
 
 # Rust Cacher Stage - caches all dependencies in the Rust code with `cargo vendor` to speed up builds massively
 # When your dependencies change, this will be re-executed, otherwise you get super-speed caching performance!
@@ -65,9 +68,6 @@ FROM rust-cacher AS base
 WORKDIR /app
 # Disable telemetry of various tools for privacy
 RUN yarn config set --home enableTelemetry 0
-# Install global dependencies with NPM
-# See https://answers.netlify.com/t/netlify-cli-fails-to-install/34508/3 for why we use `--unsafe-perm`
-RUN npm install -g --unsafe-perm netlify-cli
 # Copy the Netlify config file into the correct location
 COPY --chown=node:node ./netlify-config.json /home/node/.config/netlify/config.json
 # Copy our source code into the container
