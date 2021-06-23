@@ -18,15 +18,15 @@ end = "bonnie dc down"
 # Scripts for individual containers
 start-server = "bonnie dc up -d server"
 stop-server = "bonnie dc stop server"
-attach-server = "bonnie up-server && docker attach $(bonnie getcontainerid diana.server)"
+attach-server = "bonnie start-server && docker attach $(bonnie getcontainerid diana.server)"
 sh-server = "bonnie dc run --entrypoint \"/bin/zsh\" -p 9001:7000 --use-aliases --rm server"
 start-serverless = "bonnie dc up -d serverless"
 stop-serverless = "bonnie dc stop serverless"
-attach-serverless = "bonnie up-serverless && docker attach $(bonnie getcontainerid diana.serverless)"
+attach-serverless = "bonnie start-serverless && docker attach $(bonnie getcontainerid diana.serverless)"
 sh-serverless = "bonnie dc run --entrypoint \"/bin/zsh\" -p 9004:5000 --use-aliases --rm serverless"
 start-subscriptions-server = "bonnie dc up -d subscriptions-server"
 stop-subscriptions-server = "bonnie dc stop subscriptions-server"
-attach-subscriptions-server = "bonnie up-subscriptions-server && docker attach $(bonnie getcontainerid diana.subscriptions-server)"
+attach-subscriptions-server = "bonnie start-subscriptions-server && docker attach $(bonnie getcontainerid diana.subscriptions-server)"
 sh-subscriptions-server = "bonnie dc run --entrypoint \"/bin/zsh\" -p 9002:6000 --use-aliases --rm subscriptions-server"
 
 # Releases the project to GitHub
