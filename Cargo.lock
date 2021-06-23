@@ -1239,7 +1239,7 @@ dependencies = [
  "dev_utils",
  "lib",
  "netlify_lambda_http",
- "tokio 0.2.25",
+ "tokio 1.7.1",
 ]
 
 [[package]]
