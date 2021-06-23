@@ -50,6 +50,7 @@ COPY --chown=node:node ./Cargo.lock Cargo.lock
 COPY ./Cargo.toml Cargo.toml
 COPY ./lib/Cargo.toml lib/Cargo.toml
 COPY ./graphql_server/Cargo.toml graphql_server/Cargo.toml
+COPY ./graphql_serverless/Cargo.toml graphql_serverless/Cargo.toml
 COPY ./subscriptions_server/Cargo.toml subscriptions_server/Cargo.toml
 COPY ./dev_utils/Cargo.toml dev_utils/Cargo.toml
 # Vendor all dependencies (stores them all locally, meaning they can be cached)
@@ -64,6 +65,11 @@ FROM rust-cacher AS base
 WORKDIR /app
 # Disable telemetry of various tools for privacy
 RUN yarn config set --home enableTelemetry 0
+# Install global dependencies with NPM
+# See https://answers.netlify.com/t/netlify-cli-fails-to-install/34508/3 for why we use `--unsafe-perm`
+RUN npm install -g --unsafe-perm netlify-cli
+# Copy the Netlify config file into the correct location
+COPY ./netlify-config.json /home/node/.config/netlify/config.json
 # Copy our source code into the container
 COPY . .
 
@@ -76,7 +82,13 @@ ENTRYPOINT [ "/bin/zsh" ]
 FROM base AS server
 USER node
 WORKDIR /app/graphql_server
-ENTRYPOINT [ "/bin/zsh", "-c", "cargo watch -w . -w ../lib -x \"run --bin serverful\"" ]
+ENTRYPOINT [ "/bin/zsh", "-c", "cargo watch -w . -w ../lib -x \"run\"" ]
+
+# Serverless stage - runs the GraphQL serverless systems
+FROM base AS serverless
+USER node
+WORKDIR /app/graphql_serverless
+ENTRYPOINT [ "/bin/zsh", "-c", "cargo watch -w . -w ../lib -x \"run\"" ]
 
 # Subscriptions server stage - runs the GraphQL subscriptions server
 FROM base AS subscriptions_server

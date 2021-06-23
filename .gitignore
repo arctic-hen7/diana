@@ -2,3 +2,7 @@
 .*env*.local
 
 target/
+netlify-config.json
+
+# Local Netlify folder
+.netlify

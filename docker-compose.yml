@@ -37,6 +37,25 @@ services:
         # Allows this container to be accessed with a terminal for debugging
         stdin_open: true
         tty: true
+    serverless:
+        image: diana.serverless
+        container_name: diana.serverless
+        build:
+            context: ./
+            target: serverless # We use the serverless stage of the Dockerfile so we get a terminal prompt
+        ports:
+            - "127.0.0.1:${SERVERLESS_PORT}:5000"
+        volumes:
+            # Binds your app code into the container so changes you make are reflected instantly
+            - type: bind
+              source: ./
+              target: /app
+        depends_on:
+            - db # The DB must be started before this container can come up
+            # - subscriptions-server # If you're not using subscriptions, remove this line
+        # Allows this container to be accessed with a terminal for debugging
+        stdin_open: true
+        tty: true
     subscriptions-server:
         image: diana.subscriptions-server
         container_name: diana.subscriptions-server

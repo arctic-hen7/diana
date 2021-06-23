@@ -1,8 +1,9 @@
 # Managing the API with workspaces allows us to run multiple systems in parallel
 [workspace]
 members = [
-    "lib",
-    "graphql_server",
-    "subscriptions_server",
+    "lib", # The actual module itself
+    "graphql_server", # Testing of the query/mutation serverful system
+    "graphql_serverless", # Testing of the query/mutation serverless system
+    "subscriptions_server", # Testing of the subscription server
     "dev_utils" # The DB logic etc. for testing in a realistic way
 ]

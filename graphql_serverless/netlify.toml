@@ -1,0 +1,6 @@
+# THIS DOES NOT YET WORK AT ALL!
+[dev]
+framework = "#custom"
+command = "cargo run"
+port = 8888 # The port that the netlify dev will be accessible on
+targetPort = 3000

@@ -1,5 +1,5 @@
 [package]
-name = "graphql_server"
+name = "graphql_serverless"
 version = "0.1.0"
 authors = ["arctic_hen7 <arctic_hen7@pm.me>"]
 edition = "2018"
@@ -7,12 +7,11 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-async-graphql-actix-web = "2.8.2"
-async-graphql = "2.8.2"
-actix-web = "3.3.2"
+netlify_lambda_http = "0.2.0"
+tokio = { version = "0.2.25", features = ["macros"] }
 lib = { path = "../lib" }
 dev_utils = { path = "../dev_utils" }
 
 [[bin]]
-name = "serverful"
-path = "bin/serverful.rs"
+name = "serverless"
+path = "bin/serverless.rs"
