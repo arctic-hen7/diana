@@ -61,6 +61,11 @@ error_chain! {
             description("the builder for an http response (netlify_lambda_http) returned an error")
             display("the builder for an http response (netlify_lambda_http) returned an error")
         }
+
+        TokioPublishFailed {
+            description("failed to publish data on tokio internal broadcast")
+            display("failed to publish data on tokio internal broadcast, this should mean there were no active receivers, which shouldn't be the case (report this)")
+        }
     }
     // We work with many external libraries, all of which have their own errors
     foreign_links {

@@ -34,7 +34,6 @@ impl PublishMutation {
     // That may seem to subvert some of the purpose of GraphQL, but this resolver is to be INTERNALLY ONLY!
     // That provides a system-level data integrity guarantee, as only full mutations will call this, and through a PubSub abstraction
     // There should be very little reason for users to implement it themselves, but this type could easily be extended with custom logic
-    // TODO authenticate that messages here have actually come from the rest of the system
     async fn publish(&self, raw_ctx: &async_graphql::Context<'_>, channel: String, data: String) -> Result<bool> {
         // If this function needs to throw an error, we use a custom one since we're in a resolver
         let auth_state = get_auth_data_from_ctx(raw_ctx)?;
@@ -45,7 +44,7 @@ impl PublishMutation {
             },
             {
                 let mut pubsub = get_pubsub_from_ctx(raw_ctx)?;
-                pubsub.publish(&channel, data);
+                pubsub.publish(&channel, data)?;
                 Ok(true)
             }
         )
