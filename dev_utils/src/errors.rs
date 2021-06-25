@@ -1,5 +1,5 @@
-use error_chain::error_chain;
 pub use error_chain::bail;
+use error_chain::error_chain;
 
 // All systems use these errors, except for GraphQL resolvers, because they have to return a particular kind of error
 error_chain! {

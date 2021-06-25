@@ -1,34 +1,33 @@
-use std::pin::Pin;
-use std::task::{Context, Poll};
-use std::result::Result as StdResult;
 use actix_web::{
-    dev::{
-        Service, Transform,
-        ServiceRequest, ServiceResponse
-    },
-    Error,
-    HttpResponse,
-    HttpMessage
+    dev::{Service, ServiceRequest, ServiceResponse, Transform},
+    Error, HttpMessage, HttpResponse,
 };
 use futures::{
     future::{ok, Ready},
-    Future
+    Future,
 };
+use std::pin::Pin;
+use std::result::Result as StdResult;
+use std::task::{Context, Poll};
 
-use crate::errors::*;
-use crate::auth::jwt::{get_jwt_secret, validate_and_decode_jwt};
 use crate::auth::auth_state::{AuthState, AuthToken};
+use crate::auth::jwt::{get_jwt_secret, validate_and_decode_jwt};
+use crate::errors::*;
 
 // Extracts an authentication state from the given Optio<String> token
 // This is exposed as a primitive for serverful and serverless authentication logic
-pub fn get_token_state_from_header(auth_header: Option<&str>, secret_str: String) -> Result<AuthState> {
+pub fn get_token_state_from_header(
+    auth_header: Option<&str>,
+    secret_str: String,
+) -> Result<AuthState> {
     // Get the bearer token from the header if it exists
     let bearer_token = match auth_header {
-        Some(header) => header.split("Bearer")
-                            .collect::<Vec<&str>>()
-                            .get(1) // Get everything apart from that first element
-                            .map(|token| token.trim()),
-        None => None
+        Some(header) => header
+            .split("Bearer")
+            .collect::<Vec<&str>>()
+            .get(1) // Get everything apart from that first element
+            .map(|token| token.trim()),
+        None => None,
     };
 
     // Decode the bearer token into an authentication state
@@ -38,13 +37,11 @@ pub fn get_token_state_from_header(auth_header: Option<&str>, secret_str: String
             let decoded_jwt = validate_and_decode_jwt(&token, &jwt_secret);
 
             match decoded_jwt {
-                Some(claims) => Ok(AuthState::Authorised(
-                    AuthToken(claims)
-                )),
-                None => Ok(AuthState::InvalidToken) // The token is invalid
+                Some(claims) => Ok(AuthState::Authorised(AuthToken(claims))),
+                None => Ok(AuthState::InvalidToken), // The token is invalid
             }
         }
-        None => Ok(AuthState::NoToken) // No token exists
+        None => Ok(AuthState::NoToken), // No token exists
     }
 }
 
@@ -52,18 +49,16 @@ pub fn get_token_state_from_header(auth_header: Option<&str>, secret_str: String
 // Needs a JWT secret to validate the client's token
 fn get_token_state_from_req(req: &ServiceRequest, secret_str: String) -> Result<AuthState> {
     // Get the authorisation header from the request
-    let raw_auth_header = req
-                            .headers()
-                            .get("AUTHORIZATION");
+    let raw_auth_header = req.headers().get("AUTHORIZATION");
     let header_str = match raw_auth_header {
         Some(header) => {
             let header_str = header.to_str();
             match header_str {
                 Ok(header_str) => Some(header_str),
-                Err(_) => None
+                Err(_) => None,
             }
-        },
-        None => None
+        }
+        None => None,
     };
 
     // This returns a Result already because it needs to attempt to parse the JWT secret
@@ -75,11 +70,14 @@ fn get_token_state_from_req(req: &ServiceRequest, secret_str: String) -> Result<
 pub enum AuthVerdict {
     Allow(AuthState),
     Block,
-    Error
+    Error,
 }
 
 // Compares the given token's authentication state (as a raw result) to a given block-level to arrive at a verdict
-pub fn get_auth_verdict(token_state: Result<AuthState>, block_state: AuthCheckBlockState) -> AuthVerdict {
+pub fn get_auth_verdict(
+    token_state: Result<AuthState>,
+    block_state: AuthCheckBlockState,
+) -> AuthVerdict {
     match token_state {
         // We hold `token_state` as the AuthState variant so we don't pointlessly insert a Result into the request extensions
         Ok(token_state @ AuthState::Authorised(_)) => AuthVerdict::Allow(token_state),
@@ -89,15 +87,15 @@ pub fn get_auth_verdict(token_state: Result<AuthState>, block_state: AuthCheckBl
             } else {
                 AuthVerdict::Block
             }
-        },
+        }
         Ok(token_state @ AuthState::NoToken) => {
             if let AuthCheckBlockState::AllowAll | AuthCheckBlockState::AllowMissing = block_state {
                 AuthVerdict::Allow(token_state)
             } else {
                 AuthVerdict::Block
             }
-        },
-        Err(_) => AuthVerdict::Error
+        }
+        Err(_) => AuthVerdict::Error,
     }
 }
 
@@ -106,14 +104,14 @@ pub fn get_auth_verdict(token_state: Result<AuthState>, block_state: AuthCheckBl
 pub enum AuthCheckBlockState {
     AllowAll, // Allows anything through, adding the auth parameters to the request for later processing
     BlockUnauthenticated, // Blocks missing/invalid tokens (all requests must be authenticated)
-    AllowMissing // Only block if an invalid token is given (if no token, allowed)
+    AllowMissing, // Only block if an invalid token is given (if no token, allowed)
 }
 
 // Create a factory for authentication middleware
 #[derive(Clone)]
 pub struct AuthCheck {
     token_secret: String,
-    block_state: AuthCheckBlockState // This defines whether or not we should block requests without a token or with an invalid one
+    block_state: AuthCheckBlockState, // This defines whether or not we should block requests without a token or with an invalid one
 }
 impl AuthCheck {
     // Initialises a new instance of the authentication middleware factory
@@ -121,7 +119,7 @@ impl AuthCheck {
     pub fn new(token_secret: &str) -> Self {
         Self {
             token_secret: token_secret.to_string(),
-            block_state: AuthCheckBlockState::BlockUnauthenticated // We block by default
+            block_state: AuthCheckBlockState::BlockUnauthenticated, // We block by default
         }
     }
     // These functions allow us to initialise the middleware factory (and thus the middleware itself) with custom options
@@ -160,7 +158,7 @@ where
         ok(AuthCheckMiddleware {
             token_secret: self.token_secret.clone(),
             service,
-            block_state: self.block_state
+            block_state: self.block_state,
         })
     }
 }
@@ -170,7 +168,7 @@ where
 pub struct AuthCheckMiddleware<S> {
     token_secret: String, // The JWT secret as a string to validate client tokens
     service: S,
-    block_state: AuthCheckBlockState // This will be passed in from whatever is set for the factory
+    block_state: AuthCheckBlockState, // This will be passed in from whatever is set for the factory
 }
 
 impl<S> Service for AuthCheckMiddleware<S>
@@ -204,16 +202,16 @@ where
                     let res = fut.await?;
                     Ok(res)
                 })
-            },
+            }
             AuthVerdict::Block => {
                 // Return a 403
                 Box::pin(async move {
                     Ok(ServiceResponse::new(
-                        req.into_parts().0, // Eliminates the payload of the request
-                        HttpResponse::Unauthorized().finish() // In the playground this will come up as bad JSON, it's a direct HTTP response
+                        req.into_parts().0,                    // Eliminates the payload of the request
+                        HttpResponse::Unauthorized().finish(), // In the playground this will come up as bad JSON, it's a direct HTTP response
                     ))
                 })
-            },
+            }
             AuthVerdict::Error => {
                 // Middleware failed, we shouldn't let this proceed to the request just in case
                 // This error could be triggered by a failure in transforming the token from base64, meaning the error can be caused forcefully by an attacker
@@ -221,7 +219,7 @@ where
                 Box::pin(async move {
                     Ok(ServiceResponse::new(
                         req.into_parts().0, // Eliminates the payload of the request
-                        HttpResponse::InternalServerError().finish()
+                        HttpResponse::InternalServerError().finish(),
                     ))
                 })
             }

@@ -1,20 +1,14 @@
-use tokio::stream::{StreamExt, Stream};
-use serde::{Serialize, Deserialize};
 use async_graphql::{
-    SimpleObject as GQLSimpleObject,
-    Object as GQLObject,
-    InputObject as GQLInputObject,
-    Subscription as GQLSubscription
-};
-use mongodb::{
-    bson::doc,
-    Client as MongoClient,
-    Collection
+    InputObject as GQLInputObject, Object as GQLObject, SimpleObject as GQLSimpleObject,
+    Subscription as GQLSubscription,
 };
 use async_stream::stream;
+use mongodb::{bson::doc, Client as MongoClient, Collection};
+use serde::{Deserialize, Serialize};
+use tokio::stream::{Stream, StreamExt};
 
 // Note that we don't use `error_chain` here, just the GraphQL errors system
-use lib::errors::{GQLResult, GQLError};
+use lib::errors::{GQLError, GQLResult};
 use lib::graphql_utils::get_stream_for_channel_from_ctx;
 use lib::Publisher;
 
@@ -28,17 +22,19 @@ pub struct User {
     pub id: ObjectId,
     pub username: String,
     pub full_name: Option<String>,
-    pub password: String
+    pub password: String,
 }
 #[derive(Serialize, Deserialize, Debug, GQLInputObject)]
 pub struct UserInput {
     pub username: String,
     pub full_name: Option<String>,
-    pub password: String
+    pub password: String,
 }
 
 fn get_users(client: MongoClient) -> Collection<User> {
-    client.database("test").collection_with_type::<User>("users")
+    client
+        .database("test")
+        .collection_with_type::<User>("users")
 }
 
 // Register Query methods
@@ -49,12 +45,21 @@ impl Query {
     async fn api_version(&self) -> &str {
         "0.1.0"
     }
-    async fn users(&self, ctx: &async_graphql::Context<'_>, username: String) -> GQLResult<Vec<User>> {
+    async fn users(
+        &self,
+        ctx: &async_graphql::Context<'_>,
+        username: String,
+    ) -> GQLResult<Vec<User>> {
         let users = get_users(get_client_from_ctx(ctx)?);
 
-        let mut cursor = users.find(doc! {
-            "username": username
-        }, None).await?;
+        let mut cursor = users
+            .find(
+                doc! {
+                    "username": username
+                },
+                None,
+            )
+            .await?;
         let mut res: Vec<User> = Vec::new();
         while let Some(user) = cursor.next().await {
             res.push(user?);
@@ -68,12 +73,21 @@ impl Query {
 pub struct Mutation {}
 #[GQLObject]
 impl Mutation {
-    async fn add_user(&self, ctx: &async_graphql::Context<'_>, new_user: UserInput) -> GQLResult<User> {
+    async fn add_user(
+        &self,
+        ctx: &async_graphql::Context<'_>,
+        new_user: UserInput,
+    ) -> GQLResult<User> {
         let users = get_users(get_client_from_ctx(ctx)?);
         let users_input: Collection<UserInput> = users.clone_with_type();
 
         let insertion_res = users_input.insert_one(new_user, None).await?;
-        let inserted = users.find_one(ObjectId::find_clause_from_insertion_res(insertion_res)?, None).await?;
+        let inserted = users
+            .find_one(
+                ObjectId::find_clause_from_insertion_res(insertion_res)?,
+                None,
+            )
+            .await?;
 
         let insert_find_err = GQLError::new("Couldn't find inserted field");
 
@@ -84,9 +98,7 @@ impl Mutation {
             publisher.publish("new_user", user_json.to_string()).await?;
         }
 
-        inserted.ok_or(
-            insert_find_err
-        )
+        inserted.ok_or(insert_find_err)
     }
 }
 
@@ -99,7 +111,10 @@ impl Subscription {
         futures::stream::iter(0..10)
     }
     // Returns each new user that is added
-    async fn new_users(&self, raw_ctx: &async_graphql::Context<'_>) -> impl Stream<Item = Result<User, String>> {
+    async fn new_users(
+        &self,
+        raw_ctx: &async_graphql::Context<'_>,
+    ) -> impl Stream<Item = Result<User, String>> {
         // Get a direct stream from the context on a certain channel
         let stream = get_stream_for_channel_from_ctx("new_user", raw_ctx);
 

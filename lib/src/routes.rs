@@ -1,10 +1,8 @@
 // This file contains routes that are common between the GraphQL and subscriptions servers
 // The GraphQL and GraphQL WS routes would require generic functions as arguments to work, and so are left as they are
 
-use async_graphql::{
-    Schema, ObjectType, SubscriptionType
-};
 use actix_web::{web, HttpRequest, HttpResponse, Result as ActixResult};
+use async_graphql::{ObjectType, Schema, SubscriptionType};
 use async_graphql_actix_web::{Request, Response, WSSubscription};
 
 use crate::auth::auth_state::AuthState;
@@ -19,7 +17,7 @@ pub async fn graphql<Q, M, S>(
 where
     Q: ObjectType + 'static,
     M: ObjectType + 'static,
-    S: SubscriptionType + 'static
+    S: SubscriptionType + 'static,
 {
     // Get the GraphQL request so we can add data to it
     let mut query = req.into_inner();
@@ -42,7 +40,7 @@ pub async fn graphql_ws<Q, M, S>(
 where
     Q: ObjectType + 'static,
     M: ObjectType + 'static,
-    S: SubscriptionType + 'static
+    S: SubscriptionType + 'static,
 {
     WSSubscription::start(Schema::clone(&schema), &http_req, payload)
 }

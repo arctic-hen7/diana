@@ -1,12 +1,12 @@
 // This module defines a simple publish-subscribe structure, though one designed to run across the web
 // The publishing and subscribing are done on different servers/functions
 
-use std::collections::HashMap;
-use tokio_stream::Stream;
 use async_stream::stream;
-use tokio::sync::broadcast::{channel as create_channel, Sender};
 use reqwest::Client;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use tokio::sync::broadcast::{channel as create_channel, Sender};
+use tokio_stream::Stream;
 
 use crate::errors::*;
 
@@ -15,30 +15,30 @@ const MESSAGES_TO_BE_RETAINED: usize = 5;
 #[derive(Serialize)]
 struct GQLQueryBody<T: Serialize> {
     query: String,
-    variables: T
+    variables: T,
 }
 
 #[derive(Deserialize)]
 struct GQLPublishResponse {
-    data: PublishResponse
+    data: PublishResponse,
 }
 #[derive(Deserialize)]
 struct PublishResponse {
-    publish: bool
+    publish: bool,
 }
 
 pub struct Publisher {
     client: Client,
     address: String,
-    token: String
+    token: String,
 }
 impl Publisher {
     pub fn new(hostname: String, port: String, endpoint: String, token: String) -> Result<Self> {
         let address = format!(
             "{hostname}:{port}{endpoint}", // The endpoint should start with '/'
-            hostname=hostname,
-            port=port,
-            endpoint=endpoint
+            hostname = hostname,
+            port = port,
+            endpoint = endpoint
         );
 
         let client = Client::new();
@@ -46,7 +46,7 @@ impl Publisher {
         Ok(Self {
             client,
             address,
-            token
+            token,
         })
     }
 
@@ -68,8 +68,9 @@ impl Publisher {
                         data: $data
                     )
                 }
-            ".to_string(),
-            variables
+            "
+            .to_string(),
+            variables,
         };
 
         let res = client
@@ -85,14 +86,12 @@ impl Publisher {
         }
 
         // Get the body out (data still stringified though, that's handled by resolvers)
-        let body: GQLPublishResponse = serde_json::from_str(
-            &res.text().await?
-        )?;
+        let body: GQLPublishResponse = serde_json::from_str(&res.text().await?)?;
 
         // Confirm nothing's gone wrong on a GraphQL level (basically only if we got `false` instead of `true`)
         match body.data.publish {
             true => Ok(()),
-            _ => bail!(ErrorKind::SubscriptionDataPublishFailed)
+            _ => bail!(ErrorKind::SubscriptionDataPublishFailed),
         }
     }
 }
@@ -103,14 +102,12 @@ impl Publisher {
 // This is a traditional PubSub implementation using Tokio's broadcast system
 pub struct PubSub {
     // A hash map of channels to their Tokio broadcasters
-    channels: HashMap<
-        String, Sender<String>
-    >
+    channels: HashMap<String, Sender<String>>,
 }
 impl Default for PubSub {
     fn default() -> Self {
         Self {
-            channels: HashMap::new()
+            channels: HashMap::new(),
         }
     }
 }
@@ -148,7 +145,9 @@ impl PubSub {
     // Creates a new sender for a given channel name if one doesn't exist and then sends a message using it
     pub fn publish(&mut self, channel: &str, data: String) -> Result<()> {
         let channel_sender = self.get_channel(channel);
-        channel_sender.send(data).map_err(|_| ErrorKind::TokioPublishFailed)?;
+        channel_sender
+            .send(data)
+            .map_err(|_| ErrorKind::TokioPublishFailed)?;
 
         Ok(())
     }

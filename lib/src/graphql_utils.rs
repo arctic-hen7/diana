@@ -2,9 +2,9 @@
 use std::sync::{Mutex, MutexGuard};
 use tokio::stream::Stream;
 
-use crate::pubsub::PubSub;
 use crate::auth::auth_state::AuthState;
 use crate::errors::*;
+use crate::pubsub::PubSub;
 
 // Checks to see if the given authentication state matches the series of given claims
 // Must be provided the authentication state to operate on, a series of claims, and code to execute if authenticated
@@ -33,26 +33,36 @@ macro_rules! if_authed(
 // This returns a pre-created stream which you should manipulate if necessary (e.g. to serialise data)
 // ONLY USE THIS IN SUBSCRIPTIONS! It will only run on the serverful system (stateful)
 // TODO handle errors in this function
-pub fn get_stream_for_channel_from_ctx(channel: &str, raw_ctx: &async_graphql::Context<'_>) -> impl Stream<Item = String> {
+pub fn get_stream_for_channel_from_ctx(
+    channel: &str,
+    raw_ctx: &async_graphql::Context<'_>,
+) -> impl Stream<Item = String> {
     // Get the PubSub mutably
     let mut pubsub = get_pubsub_from_ctx(raw_ctx).unwrap(); // FIXME
-    // Return a stream on the given channel
+                                                            // Return a stream on the given channel
     pubsub.subscribe(channel)
 }
 
 // A utility function to get authentication data from the context of a GraphQL resolver
-pub fn get_auth_data_from_ctx<'a>(raw_ctx: &'a async_graphql::Context<'_>) -> Result<&'a Option<AuthState>> {
-    let auth_state = raw_ctx.data::<Option<AuthState>>()
-            .map_err(|_err| ErrorKind::GraphQLContextNotFound("auth_state".to_string()))?;
+pub fn get_auth_data_from_ctx<'a>(
+    raw_ctx: &'a async_graphql::Context<'_>,
+) -> Result<&'a Option<AuthState>> {
+    let auth_state = raw_ctx
+        .data::<Option<AuthState>>()
+        .map_err(|_err| ErrorKind::GraphQLContextNotFound("auth_state".to_string()))?;
 
     Ok(auth_state)
 }
 // A utility function to get a mutable verion of the PubSub from the context of a GraphQL resolver
-pub fn get_pubsub_from_ctx<'a>(raw_ctx: &'a async_graphql::Context<'_>) -> Result<MutexGuard<'a, PubSub>> {
+pub fn get_pubsub_from_ctx<'a>(
+    raw_ctx: &'a async_graphql::Context<'_>,
+) -> Result<MutexGuard<'a, PubSub>> {
     // We store the PubSub instance as a Mutex because we need it sent/synced between threads as a mutable
-    let pubsub_mutex = raw_ctx.data::<Mutex<PubSub>>()
-            .map_err(|_err| ErrorKind::GraphQLContextNotFound("pubsub".to_string()))?;
-    let pubsub = pubsub_mutex.lock()
+    let pubsub_mutex = raw_ctx
+        .data::<Mutex<PubSub>>()
+        .map_err(|_err| ErrorKind::GraphQLContextNotFound("pubsub".to_string()))?;
+    let pubsub = pubsub_mutex
+        .lock()
         .map_err(|_err| ErrorKind::MutexPoisoned("pubsub".to_string()))?;
 
     Ok(pubsub)

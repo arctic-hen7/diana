@@ -1,10 +1,7 @@
+use chrono::{prelude::Utc, Duration};
+use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use serde::{Serialize, Deserialize};
-use jsonwebtoken::{encode, Algorithm, Header, EncodingKey, decode, DecodingKey, Validation};
-use chrono::{
-    Duration,
-    prelude::Utc
-};
 
 use crate::errors::*;
 
@@ -12,12 +9,12 @@ use crate::errors::*;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Claims {
     pub exp: u64,
-    pub claims: HashMap<String, String> // The additional claims the user makes (as generic as possible)
+    pub claims: HashMap<String, String>, // The additional claims the user makes (as generic as possible)
 }
 
 pub struct JWTSecret<'a> {
     encoding_key: EncodingKey,
-    decoding_key: DecodingKey<'a>
+    decoding_key: DecodingKey<'a>,
 }
 
 // A function to get a JWT secret from a given string for both encoding and decoding
@@ -25,12 +22,10 @@ pub fn get_jwt_secret<'a>(secret_str: String) -> Result<JWTSecret<'a>> {
     let encoding_key = EncodingKey::from_base64_secret(&secret_str)?;
     let decoding_key = DecodingKey::from_base64_secret(&secret_str)?;
 
-    Ok(
-        JWTSecret {
-            encoding_key,
-            decoding_key
-        }
-    )
+    Ok(JWTSecret {
+        encoding_key,
+        decoding_key,
+    })
 }
 
 /**
@@ -68,7 +63,7 @@ pub fn decode_time_str(time_str: &str) -> Result<u64> {
                 'w' => Duration::weeks(interval_length),
                 'M' => Duration::days(interval_length * 30), // Multiplying the number of months by 30 days (assumed length of a month)
                 'y' => Duration::days(interval_length * 365), // Multiplying the number of years by 365 days (assumed length of a year)
-                c => bail!(ErrorKind::InvalidDatetimeIntervalIndicator(c.to_string()))
+                c => bail!(ErrorKind::InvalidDatetimeIntervalIndicator(c.to_string())),
             };
             duration_after_current = duration_after_current + duration;
             // Reset that working variable
@@ -81,16 +76,20 @@ pub fn decode_time_str(time_str: &str) -> Result<u64> {
     Ok(datetime.timestamp() as u64) // As Unix timestamp
 }
 
-pub fn create_jwt(user_claims: HashMap<String, String>, secret: &JWTSecret, exp: u64) -> Result<String> {
+pub fn create_jwt(
+    user_claims: HashMap<String, String>,
+    secret: &JWTSecret,
+    exp: u64,
+) -> Result<String> {
     // Create the claims
     let claims = Claims {
         exp,
-        claims: user_claims
+        claims: user_claims,
     };
     let token = encode(
         &Header::new(Algorithm::HS512),
         &claims,
-        &secret.encoding_key
+        &secret.encoding_key,
     )?;
 
     Ok(token)
@@ -100,11 +99,11 @@ pub fn validate_and_decode_jwt(jwt: &str, secret: &JWTSecret) -> Option<Claims> 
     let decoded = decode::<Claims>(
         jwt,
         &secret.decoding_key,
-        &Validation::new(Algorithm::HS512)
+        &Validation::new(Algorithm::HS512),
     );
 
     match decoded {
         Ok(decoded) => Some(decoded.claims),
-        Err(_) => None
+        Err(_) => None,
     }
 }

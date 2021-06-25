@@ -12,20 +12,17 @@ pub struct AuthToken(pub Claims);
 pub enum AuthState {
     Authorised(AuthToken),
     InvalidToken,
-    NoToken
+    NoToken,
 }
 
 impl AuthState {
     // Checks the claims set in the token by the user
     // This accepts a HashMap of `&str` for convenience of writing
     pub fn has_claims(&self, test_claims: HashMap<&str, &str>) -> bool {
-        if let Self::Authorised(AuthToken(Claims {
-            claims,
-            ..
-        })) = self {
+        if let Self::Authorised(AuthToken(Claims { claims, .. })) = self {
             for (key, val) in &test_claims {
                 if claims.get(&key.to_string()) != Some(&val.to_string()) {
-                    return false
+                    return false;
                 }
             }
 

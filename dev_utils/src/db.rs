@@ -1,8 +1,8 @@
-use std::env;
 use mongodb::{
+    options::{ClientOptions, Credential, StreamAddress},
     Client as MongoClient,
-    options::{ClientOptions, StreamAddress, Credential},
 };
+use std::env;
 
 use crate::errors::*;
 use crate::load_env::load_env;
@@ -15,24 +15,23 @@ pub fn get_client() -> Result<MongoClient> {
     let hostname = env::var("DB_HOSTNAME")?;
     let port = env::var("DB_PORT")?
         .parse::<u16>() // Ports are not going to be larger than a 16-bit integer
-        .map_err(|_err| ErrorKind::InvalidEnvVarType("DB_PORT".to_string(), "number".to_string()))?;
+        .map_err(|_err| {
+            ErrorKind::InvalidEnvVarType("DB_PORT".to_string(), "number".to_string())
+        })?;
     let username = env::var("DB_USERNAME")?;
     let password = env::var("DB_PASSWORD")?;
-    let options =
-        ClientOptions::builder()
-            .hosts(vec![
-                StreamAddress {
-                    hostname,
-                    port: Some(port),
-                }
-            ])
-            .credential(
-                Credential::builder()
-                    .username(username)
-                    .password(password)
-                    .build()
-            )
-            .build();
+    let options = ClientOptions::builder()
+        .hosts(vec![StreamAddress {
+            hostname,
+            port: Some(port),
+        }])
+        .credential(
+            Credential::builder()
+                .username(username)
+                .password(password)
+                .build(),
+        )
+        .build();
     let client = MongoClient::with_options(options)?;
 
     Ok(client)

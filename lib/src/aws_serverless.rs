@@ -1,16 +1,12 @@
 // This file contains serverless logic unique to AWS Lambda and its derivatives (e.g. Netlify)
 
-use std::any::Any;
-use netlify_lambda_http::{
-    Request, Response
-};
+use async_graphql::{ObjectType, SubscriptionType};
 use aws_lambda_events::encodings::Body;
-use async_graphql::{
-    ObjectType, SubscriptionType
-};
+use netlify_lambda_http::{Request, Response};
+use std::any::Any;
 
 use crate::options::Options;
-use crate::serverless::{ServerlessResponse, run_serverless_req};
+use crate::serverless::{run_serverless_req, ServerlessResponse};
 
 // A generic error type that the lambda will accept
 pub type AwsError = Box<dyn std::error::Error + Send + Sync + 'static>;
@@ -18,7 +14,7 @@ pub type AwsError = Box<dyn std::error::Error + Send + Sync + 'static>;
 // This allows us to propagate error HTTP responses more easily
 enum AwsReqData {
     Valid((String, Option<String>)),
-    Invalid(Response<String>) // For some reason
+    Invalid(Response<String>), // For some reason
 }
 
 // Gets the stringified body and authentication header from an AWS request
@@ -31,16 +27,16 @@ fn get_data_from_aws_req(req: Request) -> Result<AwsReqData, AwsError> {
         Body::Text(body_str) => body_str.to_string(),
         Body::Binary(_) => {
             let res = Response::builder()
-                        .status(400) // Invalid request
-                        .body("Found binary body, expected string".to_string())?;
+                .status(400) // Invalid request
+                .body("Found binary body, expected string".to_string())?;
             return Ok(AwsReqData::Invalid(res));
-        },
+        }
         Body::Empty => {
             let res = Response::builder()
-                        .status(400) // Invalid request
-                        .body("Found empty body, expected string".to_string())?;
+                .status(400) // Invalid request
+                .body("Found empty body, expected string".to_string())?;
             return Ok(AwsReqData::Invalid(res));
-        },
+        }
     };
     // Get the authorisation header as a string
     // Any errors are returned gracefully as HTTP responses
@@ -52,33 +48,30 @@ fn get_data_from_aws_req(req: Request) -> Result<AwsReqData, AwsError> {
                 Ok(header_str) => Some(header_str.to_string()),
                 Err(_) => {
                     let res = Response::builder()
-                                .status(400) // Invalid request
-                                .body("Couldn't parse authorization header as string".to_string())?;
-                    return Ok(AwsReqData::Invalid(res))
+                        .status(400) // Invalid request
+                        .body("Couldn't parse authorization header as string".to_string())?;
+                    return Ok(AwsReqData::Invalid(res));
                 }
             }
-        },
-        None => None
+        }
+        None => None,
     };
 
-    Ok(AwsReqData::Valid((
-        body,
-        auth_header
-    )))
+    Ok(AwsReqData::Valid((body, auth_header)))
 }
 
 // Parses the response from `run_serverless_req` into HTTP responses that AWS Lambda (or derivatives) can handle
 fn parse_aws_res(res: ServerlessResponse) -> Result<Response<String>, AwsError> {
     let res = match res {
         ServerlessResponse::Success(gql_res_str) => Response::builder()
-                                                        .status(200) // GraphQL will handle any errors within it through JSON
-                                                        .body(gql_res_str)?,
+            .status(200) // GraphQL will handle any errors within it through JSON
+            .body(gql_res_str)?,
         ServerlessResponse::Blocked => Response::builder()
-                                            .status(403) // Unauthorised
-                                            .body("Request blocked due to invalid or insufficient authentication".to_string())?,
+            .status(403) // Unauthorised
+            .body("Request blocked due to invalid or insufficient authentication".to_string())?,
         ServerlessResponse::Error => Response::builder()
-                                        .status(500) // Internal server error
-                                        .body("An internal server error occurred".to_string())?
+            .status(500) // Internal server error
+            .body("An internal server error occurred".to_string())?,
     };
 
     Ok(res)
@@ -86,13 +79,13 @@ fn parse_aws_res(res: ServerlessResponse) -> Result<Response<String>, AwsError> 
 
 pub async fn run_aws_req<C, Q, M, S>(
     req: Request,
-    opts: Options<C, Q, M, S>
+    opts: Options<C, Q, M, S>,
 ) -> Result<Response<String>, AwsError>
 where
     C: Any + Send + Sync + Clone,
     Q: Clone + ObjectType + 'static,
     M: Clone + ObjectType + 'static,
-    S: Clone + SubscriptionType + 'static
+    S: Clone + SubscriptionType + 'static,
 {
     // Process the request data into what's needed
     let req_data = get_data_from_aws_req(req)?;

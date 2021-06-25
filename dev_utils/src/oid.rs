@@ -1,19 +1,9 @@
-use serde::{Serialize, Deserialize};
-use async_graphql::{
-    ScalarType,
-    Scalar,
-    Value as GQLValue,
-    InputValueResult,
-    InputValueError,
-};
+use async_graphql::{InputValueError, InputValueResult, Scalar, ScalarType, Value as GQLValue};
 use mongodb::{
-    bson::{
-        doc,
-        oid::ObjectId as MongoObjectId,
-        Document
-    },
-    results::InsertOneResult
+    bson::{doc, oid::ObjectId as MongoObjectId, Document},
+    results::InsertOneResult,
 };
+use serde::{Deserialize, Serialize};
 
 use crate::errors::*;
 
@@ -23,17 +13,13 @@ pub struct ObjectId(MongoObjectId);
 impl ObjectId {
     // Creates a new instance of the scalar from a string
     pub fn new(hex_string: &str) -> Result<Self> {
-        let new_oid = Self(
-            MongoObjectId::with_string(hex_string)?
-        );
+        let new_oid = Self(MongoObjectId::with_string(hex_string)?);
 
         Ok(new_oid)
     }
     // Creates a new instance of the scalar from a raw MongoDB ObjectId
     pub fn from_oid(oid: &MongoObjectId) -> Self {
-        Self(
-            oid.clone()
-        )
+        Self(oid.clone())
     }
     // Returns just the ObjectId itself for interfacing directly with the MongoDb driver
     pub fn to_raw(&self) -> MongoObjectId {
@@ -41,7 +27,7 @@ impl ObjectId {
     }
     // Creates a document so we can search by `_id`
     pub fn as_find_clause(&self) -> Document {
-        doc!{
+        doc! {
             "_id": self.to_raw()
         }
     }
@@ -49,12 +35,13 @@ impl ObjectId {
     // This needs the result of an `insert_one` operation (loop through and create that if you'ure using `insert_many`)
     pub fn find_clause_from_insertion_res(insertion_res: InsertOneResult) -> Result<Document> {
         let oid = Self::from_oid(
-            insertion_res.inserted_id.as_object_id().ok_or(
-                ErrorKind::OidSerializationFailed
-            )?
+            insertion_res
+                .inserted_id
+                .as_object_id()
+                .ok_or(ErrorKind::OidSerializationFailed)?,
         );
 
-        Ok(doc!{
+        Ok(doc! {
             "_id": oid.to_raw()
         })
     }

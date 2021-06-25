@@ -2,20 +2,17 @@
 // This exposes more generic primitives that the serverless systems not derived from AWS Lambda can depend on
 // If a user wants to use some fancy new serverless system that doesn't even have requests, they can use this as long as they have a request body and auth header!
 
+use async_graphql::{ObjectType, Request, SubscriptionType};
 use std::any::Any;
-use async_graphql::{
-    ObjectType, SubscriptionType,
-    Request
-};
 
-use crate::graphql::{get_schema_without_subscriptions};
-use crate::auth::middleware::{AuthVerdict, get_token_state_from_header, get_auth_verdict};
-use crate::options::{Options};
+use crate::auth::middleware::{get_auth_verdict, get_token_state_from_header, AuthVerdict};
+use crate::graphql::get_schema_without_subscriptions;
+use crate::options::Options;
 
 pub enum ServerlessResponse {
     Success(String),
     Blocked,
-    Error
+    Error,
 }
 
 // Runs the given GraphQL query/mutation
@@ -25,20 +22,21 @@ pub enum ServerlessResponse {
 pub async fn run_serverless_req<C, Q, M, S>(
     body: String,
     raw_auth_header: Option<&str>,
-    opts: Options<C, Q, M, S>
+    opts: Options<C, Q, M, S>,
 ) -> ServerlessResponse
 where
     C: Any + Send + Sync + Clone,
     Q: Clone + ObjectType + 'static,
     M: Clone + ObjectType + 'static,
-    S: Clone + SubscriptionType + 'static
+    S: Clone + SubscriptionType + 'static,
 {
     // Get the schema (this also creates a publisher to the subscriptions server and inserts context)
     // We deal with any errors directly with the serverless response enum
-    let schema = get_schema_without_subscriptions(opts.schema, opts.subscriptions_server_data, opts.ctx);
+    let schema =
+        get_schema_without_subscriptions(opts.schema, opts.subscriptions_server_data, opts.ctx);
     let schema = match schema {
         Ok(schema) => schema,
-        Err(_) => return ServerlessResponse::Error
+        Err(_) => return ServerlessResponse::Error,
     };
 
     // Get a verdict on whether or not the user should be allowed through
@@ -51,7 +49,7 @@ where
             let gql_req = serde_json::from_str::<Request>(&body);
             let mut gql_req = match gql_req {
                 Ok(gql_req) => gql_req,
-                Err(_) => return ServerlessResponse::Error
+                Err(_) => return ServerlessResponse::Error,
             };
             // Insert the authentication data directly into that
             gql_req = gql_req.data(auth_data);
@@ -61,12 +59,12 @@ where
             let res_str = serde_json::to_string(&res);
             let res_str = match res_str {
                 Ok(res_str) => res_str,
-                Err(_) => return ServerlessResponse::Error
+                Err(_) => return ServerlessResponse::Error,
             };
 
             ServerlessResponse::Success(res_str)
-        },
+        }
         AuthVerdict::Block => ServerlessResponse::Blocked,
-        AuthVerdict::Error => ServerlessResponse::Error
+        AuthVerdict::Error => ServerlessResponse::Error,
     }
 }
