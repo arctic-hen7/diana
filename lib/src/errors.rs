@@ -68,6 +68,11 @@ error_chain! {
             description("not all required builder fields were instantiated")
             display("some required builder fields haven't been instantiated")
         }
+
+        HttpResponseBuilderFailed {
+            description("the builder for an http response (netlify_lambda_http) returned an error")
+            display("the builder for an http response (netlify_lambda_http) returned an error")
+        }
     }
     // We work with many external libraries, all of which have their own errors
     foreign_links {

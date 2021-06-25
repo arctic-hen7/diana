@@ -1236,6 +1236,7 @@ dependencies = [
 name = "graphql_serverless"
 version = "0.1.0"
 dependencies = [
+ "aws_lambda_events",
  "dev_utils",
  "lib",
  "netlify_lambda_http",
@@ -1588,6 +1589,7 @@ dependencies = [
  "async-graphql",
  "async-graphql-actix-web",
  "async-stream",
+ "aws_lambda_events",
  "bus",
  "chrono",
  "dotenv",
@@ -1596,6 +1598,7 @@ dependencies = [
  "jsonwebtoken",
  "maplit",
  "mongodb",
+ "netlify_lambda_http",
  "reqwest",
  "serde",
  "serde_derive",

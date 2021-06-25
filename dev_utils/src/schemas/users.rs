@@ -46,6 +46,9 @@ fn get_users(client: MongoClient) -> Collection<User> {
 pub struct Query {}
 #[GQLObject]
 impl Query {
+    async fn api_version(&self) -> &str {
+        "0.1.0"
+    }
     async fn users(&self, ctx: &async_graphql::Context<'_>, username: String) -> GQLResult<Vec<User>> {
         let users = get_users(get_client_from_ctx(ctx)?);
 

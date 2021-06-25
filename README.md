@@ -30,12 +30,13 @@ TODO further docs
 
 ## Why the name?
 
-*Diana* is the Roman name for the Greek goddess *Artemis*, the sister of the god *Apollo*. Apollo is also a GraphQL-focused company, and Diana is an open-source GraphQL system for Rust (a language Apollo presently has no support for). Diana has absolutely no affiliation with Apollo the company though!
+_Diana_ is the Roman name for the Greek goddess _Artemis_, the sister of the god _Apollo_. Apollo is also a GraphQL-focused company, and Diana is an open-source GraphQL system for Rust (a language Apollo presently has no support for). Diana has absolutely no affiliation with Apollo the company though!
 
 ## Roadmap
 
-* [ ] Write tests for existing code
-* [ ] Support authentication over WebSockets for subscriptions
+-   [ ] Write tests for existing code
+-   [ ] Support GraphiQL over serverless
+-   [ ] Support authentication over WebSockets for subscriptions
 
 ## Contributing
 

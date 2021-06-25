@@ -106,7 +106,7 @@ where
 }
 pub fn get_schema_for_subscriptions<C, Q, M, S>(
     user_schema: UserSchema<Q, M, S>,
-    subscription_server_info: SubscriptionsServerInformation,
+    _: SubscriptionsServerInformation, // Included for universality of arguments
     user_ctx: C
 ) -> Schema<SubscriptionQuery, PublishMutation, S>
 where

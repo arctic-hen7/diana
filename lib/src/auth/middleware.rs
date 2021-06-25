@@ -19,30 +19,15 @@ use crate::errors::*;
 use crate::auth::jwt::{get_jwt_secret, validate_and_decode_jwt};
 use crate::auth::auth_state::{AuthState, AuthToken};
 
-// Extracts an authentication state from the given request
-// Needs a JWT secret to validate the client's token
-fn get_token_state_from_req(req: &ServiceRequest, secret_str: String) -> Result<AuthState> {
-    // Get the authorisation header from the request
-    let raw_auth_header = req
-                            .headers()
-                            .get("AUTHORIZATION");
-    // Get the bearer token from that if it exists
-    // This will end up as an option
-    let bearer_token = match raw_auth_header {
-        Some(header) => {
-            let header_str = header.to_str();
-            let header_str = match header_str {
-                Ok(header_str) => {
-                    let bearer_token = header_str.split("Bearer")
-                                .collect::<Vec<&str>>()
-                                .get(1) // Get everything apart from that first element
-                                .map(|token| token.trim());
-                    bearer_token
-                },
-                Err(_) => None
-            };
-            header_str
-        },
+// Extracts an authentication state from the given Optio<String> token
+// This is exposed as a primitive for serverful and serverless authentication logic
+pub fn get_token_state_from_header(auth_header: Option<&str>, secret_str: String) -> Result<AuthState> {
+    // Get the bearer token from the header if it exists
+    let bearer_token = match auth_header {
+        Some(header) => header.split("Bearer")
+                            .collect::<Vec<&str>>()
+                            .get(1) // Get everything apart from that first element
+                            .map(|token| token.trim()),
         None => None
     };
 
@@ -60,6 +45,59 @@ fn get_token_state_from_req(req: &ServiceRequest, secret_str: String) -> Result<
             }
         }
         None => Ok(AuthState::NoToken) // No token exists
+    }
+}
+
+// Extracts an authentication state from the given request
+// Needs a JWT secret to validate the client's token
+fn get_token_state_from_req(req: &ServiceRequest, secret_str: String) -> Result<AuthState> {
+    // Get the authorisation header from the request
+    let raw_auth_header = req
+                            .headers()
+                            .get("AUTHORIZATION");
+    let header_str = match raw_auth_header {
+        Some(header) => {
+            let header_str = header.to_str();
+            match header_str {
+                Ok(header_str) => Some(header_str),
+                Err(_) => None
+            }
+        },
+        None => None
+    };
+
+    // This returns a Result already because it needs to attempt to parse the JWT secret
+    get_token_state_from_header(header_str, secret_str)
+}
+
+// The final decision as to whether or not a user should be allowed through
+// We need this because some things can fail
+pub enum AuthVerdict {
+    Allow(AuthState),
+    Block,
+    Error
+}
+
+// Compares the given token's authentication state (as a raw result) to a given block-level to arrive at a verdict
+pub fn get_auth_verdict(token_state: Result<AuthState>, block_state: AuthCheckBlockState) -> AuthVerdict {
+    match token_state {
+        // We hold `token_state` as the AuthState variant so we don't pointlessly insert a Result into the request extensions
+        Ok(token_state @ AuthState::Authorised(_)) => AuthVerdict::Allow(token_state),
+        Ok(token_state @ AuthState::InvalidToken) => {
+            if let AuthCheckBlockState::AllowAll = block_state {
+                AuthVerdict::Allow(token_state)
+            } else {
+                AuthVerdict::Block
+            }
+        },
+        Ok(token_state @ AuthState::NoToken) => {
+            if let AuthCheckBlockState::AllowAll | AuthCheckBlockState::AllowMissing = block_state {
+                AuthVerdict::Allow(token_state)
+            } else {
+                AuthVerdict::Block
+            }
+        },
+        Err(_) => AuthVerdict::Error
     }
 }
 
@@ -155,56 +193,28 @@ where
     fn call(&mut self, req: ServiceRequest) -> Self::Future {
         // Check the token
         let token_state = get_token_state_from_req(&req, self.token_secret.clone());
-        match token_state {
-            // We hold `token_state` as the AuthState variant so we don't pointlessly insert a Result into the request extensions
-            Ok(token_state @ AuthState::Authorised(_)) => {
-                // The token is authorised, these will always be let through
+        let verdict = get_auth_verdict(token_state, self.block_state);
+        match verdict {
+            AuthVerdict::Allow(token_state) => {
+                // Insert the authentication data into the request extensions for later retrieval
                 req.extensions_mut().insert(token_state);
+                // Move on from this middleware to the handler
                 let fut = self.service.call(req);
                 Box::pin(async move {
                     let res = fut.await?;
                     Ok(res)
                 })
             },
-            Ok(token_state @ AuthState::InvalidToken) => {
-                if let AuthCheckBlockState::AllowAll = self.block_state {
-                    // Anything is being let through, pass the state to the handler
-                    req.extensions_mut().insert(token_state);
-                    let fut = self.service.call(req);
-                    Box::pin(async move {
-                        let res = fut.await?;
-                        Ok(res)
-                    })
-                } else {
-                    // We're blocking unauthenticated requests, return a 403 error
-                    Box::pin(async move {
-                        Ok(ServiceResponse::new(
-                            req.into_parts().0, // Eliminates the payload of the request
-                            HttpResponse::Unauthorized().finish() // In the playground this will come up as bad JSON, it's a direct HTTP response
-                        ))
-                    })
-                }
+            AuthVerdict::Block => {
+                // Return a 403
+                Box::pin(async move {
+                    Ok(ServiceResponse::new(
+                        req.into_parts().0, // Eliminates the payload of the request
+                        HttpResponse::Unauthorized().finish() // In the playground this will come up as bad JSON, it's a direct HTTP response
+                    ))
+                })
             },
-            Ok(token_state @ AuthState::NoToken) => {
-                if let AuthCheckBlockState::AllowAll | AuthCheckBlockState::AllowMissing = self.block_state {
-                    // Missing tokens are being let through, pass the state to the handler
-                    req.extensions_mut().insert(token_state);
-                    let fut = self.service.call(req);
-                    Box::pin(async move {
-                        let res = fut.await?;
-                        Ok(res)
-                    })
-                } else {
-                    // We're blocking unauthenticated requests, return a 403 error
-                    Box::pin(async move {
-                        Ok(ServiceResponse::new(
-                            req.into_parts().0, // Eliminates the payload of the request
-                            HttpResponse::Unauthorized().finish() // In the playground this will come up as bad JSON, it's a direct HTTP response
-                        ))
-                    })
-                }
-            },
-            Err(_) => {
+            AuthVerdict::Error => {
                 // Middleware failed, we shouldn't let this proceed to the request just in case
                 // This error could be triggered by a failure in transforming the token from base64, meaning the error can be caused forcefully by an attacker
                 // In that scenario, we can't allow the bypassing of this layer

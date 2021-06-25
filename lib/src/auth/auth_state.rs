@@ -15,7 +15,6 @@ pub enum AuthState {
     NoToken
 }
 
-
 impl AuthState {
     // Checks the claims set in the token by the user
     // This accepts a HashMap of `&str` for convenience of writing

@@ -8,12 +8,14 @@ mod pubsub;
 mod options;
 mod graphql_server;
 mod subscriptions_server;
+mod serverless;
 mod auth;
 mod routes;
 
 // Public exports accessible from the root (everything the user will need)
 pub use crate::graphql_server::create_graphql_server;
 pub use crate::subscriptions_server::create_subscriptions_server;
+pub use crate::serverless::{ServerlessResponse, run_serverless_req};
 pub use crate::options::{Options, OptionsBuilder, AuthCheckBlockState};
 pub use crate::pubsub::Publisher;
 
