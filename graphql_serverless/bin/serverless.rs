@@ -1,15 +1,14 @@
 #![forbid(unsafe_code)]
 
-use netlify_lambda_http::{
-    handler,
-    lambda::{Context as LambdaCtx, run as run_lambda},
-    IntoResponse, Request
-};
 use lib::{
     OptionsBuilder,
     AuthCheckBlockState,
     AwsError,
-    run_aws_req
+    run_aws_req,
+
+    create_handler,
+    LambdaCtx, run_lambda,
+    IntoLambdaResponse, LambdaRequest
 };
 use dev_utils::{
     ctx::Context,
@@ -19,11 +18,11 @@ use dev_utils::{
 
 #[tokio::main]
 async fn main() -> Result<(), AwsError> {
-    run_lambda(handler(graphql)).await?;
+    run_lambda(create_handler(graphql)).await?;
     Ok(())
 }
 
-async fn graphql(req: Request, _: LambdaCtx) -> Result<impl IntoResponse, AwsError> {
+async fn graphql(req: LambdaRequest, _: LambdaCtx) -> Result<impl IntoLambdaResponse, AwsError> {
     let opts = OptionsBuilder::new()
                     .ctx(Context {
                         pool: DbPool::default()

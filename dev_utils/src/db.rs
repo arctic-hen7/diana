@@ -4,7 +4,7 @@ use mongodb::{
     options::{ClientOptions, StreamAddress, Credential},
 };
 
-use lib::errors::*;
+use crate::errors::*;
 use crate::load_env::load_env;
 
 // A helper function for implementations of the DbClient trait that gets a handle to a DB client from environment variables

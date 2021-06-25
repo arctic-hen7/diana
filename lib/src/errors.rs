@@ -5,18 +5,6 @@ pub use error_chain::bail;
 error_chain! {
     // The custom errors for this crate
     errors {
-        InvalidToolchainName(t: String) {
-            description("invalid toolchain name")
-            display("invalid toolchain name: '{}'", t)
-        }
-
-        // You can also add commas after description/display.
-        // This may work better with some editor auto-indentation modes:
-        UnknownToolchainVersion(v: String) {
-            description("unknown toolchain version"), // note the ,
-            display("unknown toolchain version: '{}'", v), // trailing comma is allowed
-        }
-
         // For when an environment variable has an invalid type
         // For example if a port is given as a hex string for some reason
         InvalidEnvVarType(var_name: String, expected: String) {
@@ -77,10 +65,7 @@ error_chain! {
     // We work with many external libraries, all of which have their own errors
     foreign_links {
         Io(::std::io::Error);
-        EnvFile(::dotenv::Error);
         EnvVar(::std::env::VarError);
-        Mongo(::mongodb::error::Error);
-        BsonOid(::mongodb::bson::oid::Error);
         Reqwest(::reqwest::Error);
         Json(::serde_json::Error);
         JsonWebToken(::jsonwebtoken::errors::Error);

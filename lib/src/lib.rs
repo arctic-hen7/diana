@@ -23,3 +23,9 @@ pub use crate::pubsub::Publisher;
 
 // Users shouldn't have to install Actix Web themselves for basic usage
 pub use actix_web::{App, HttpServer};
+// Users also shouldn't have to install the Netlify stuff themselves for basic usage
+pub use netlify_lambda_http::{
+    handler as create_handler,
+    lambda::{Context as LambdaCtx, run as run_lambda},
+    IntoResponse as IntoLambdaResponse, Request as LambdaRequest
+};

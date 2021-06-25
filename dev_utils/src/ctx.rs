@@ -1,5 +1,5 @@
 use mongodb::Client as MongoClient;
-use lib::errors::*;
+use crate::errors::*;
 use crate::db::DbPool;
 
 // We make an instance of the database client accessible to all GraphQL resolvers through context
