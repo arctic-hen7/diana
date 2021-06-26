@@ -143,13 +143,10 @@ impl PubSub {
     }
 
     // Creates a new sender for a given channel name if one doesn't exist and then sends a message using it
-    pub fn publish(&mut self, channel: &str, data: String) -> Result<()> {
+    pub fn publish(&mut self, channel: &str, data: String) {
         let channel_sender = self.get_channel(channel);
-        channel_sender
-            .send(data)
-            .map_err(|_| ErrorKind::TokioPublishFailed)?;
-
-        Ok(())
+        // This will fail only if there are now receivers, but we don't care if that's the case
+        channel_sender.send(data);
     }
 
     // Drops the handle to a sender for the given channel

@@ -43,7 +43,7 @@ impl PublishMutation {
             },
             {
                 let mut pubsub = get_pubsub_from_ctx(raw_ctx)?;
-                pubsub.publish(&channel, data)?;
+                pubsub.publish(&channel, data);
                 Ok(true)
             }
         )

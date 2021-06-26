@@ -62,11 +62,6 @@ error_chain! {
             display("the builder for an http response (netlify_lambda_http) returned an error")
         }
 
-        TokioPublishFailed {
-            description("failed to publish data on tokio internal broadcast")
-            display("failed to publish data on tokio internal broadcast, this should mean there were no active receivers, which shouldn't be the case (report this)")
-        }
-
         InvokedSubscriptionsServerWithInvalidOptions {
             description("you tried to create a subscriptions server without configuring it in the options")
             display("you tried to create a subscriptions server without configuring it in the options")
