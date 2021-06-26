@@ -19,19 +19,24 @@ use crate::options::{AuthCheckBlockState, Options};
 use crate::pubsub::PubSub;
 use crate::routes::{graphql, graphql_ws};
 
+use crate::errors::*;
+
 pub fn create_subscriptions_server<C, Q, M, S>(
     opts: Options<C, Q, M, S>,
-) -> impl FnOnce(&mut ServiceConfig) + Clone
+) -> Result<impl FnOnce(&mut ServiceConfig) + Clone>
 where
     C: Any + Send + Sync + Clone,
     Q: Clone + ObjectType + 'static,
     M: Clone + ObjectType + 'static,
     S: Clone + SubscriptionType + 'static,
 {
-    let subscriptions_server_data = opts.subscriptions_server_data.clone();
+    let subscriptions_server_data = match opts.subscriptions_server_data {
+        Some(subscriptions_server_data) => subscriptions_server_data,
+        None => bail!(ErrorKind::InvokedSubscriptionsServerWithInvalidOptions),
+    };
     // Get the schema (this also creates a publisher to the subscriptions server and inserts context)
     // The one for subscriptions can't fail (no publisher)
-    let schema = get_schema_for_subscriptions(opts.schema, subscriptions_server_data, opts.ctx);
+    let schema = get_schema_for_subscriptions(opts.schema, opts.ctx);
     // Get the appropriate authentication middleware set up with the JWT secret
     // This is only used if the GraphiQL playground needs authentication in production
     let auth_middleware = match opts.authentication_block_state {
@@ -42,13 +47,13 @@ where
         }
     };
 
-    let graphql_endpoint = opts.subscriptions_server_data.endpoint; // The subscriptions server can have a different endpoint if needed
+    let graphql_endpoint = subscriptions_server_data.endpoint; // The subscriptions server can have a different endpoint if needed
     let playground_endpoint = opts.playground_endpoint;
     let jwt_secret = opts.jwt_secret;
 
     // Actix Web allows us to configure apps with `.configure()`, which is what the user will do
     // Now we create the closure that will configure the user's app to support a GraphQL server
-    move |cfg: &mut ServiceConfig| {
+    let configurer = move |cfg: &mut ServiceConfig| {
         // Add everything except for the playground endpoint (which may not even exist)
         cfg.data(schema.clone()) // Clone the full schema we got before and provide it here
             .data(Mutex::new(PubSub::default())) // The subscriptions server also uses an internal PubSub system
@@ -105,5 +110,7 @@ where
             None => (),
         };
         // This closure works entirely with side effects, so we don't need to return anything here
-    }
+    };
+
+    Ok(configurer)
 }

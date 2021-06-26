@@ -18,7 +18,7 @@ where
     S: Clone + SubscriptionType + 'static,
 {
     pub ctx: C, // The user's custom context, often a database connection pool
-    pub subscriptions_server_data: SubscriptionsServerInformation,
+    pub subscriptions_server_data: Option<SubscriptionsServerInformation>, // Some systems may not actually use a subscriptions server
     pub schema: UserSchema<Q, M, S>, // The schema the user defines
     pub jwt_secret: String, // This allows checking client tokens (should be different to the subscription server's secret)
     pub authentication_block_state: AuthCheckBlockState, // The level of blocking that will be used for the endpoint
@@ -36,10 +36,11 @@ where
     S: Clone + SubscriptionType + 'static,
 {
     ctx: Option<C>,
-    subscriptions_server_hostname: Option<String>,
-    subscriptions_server_port: Option<String>,
-    subscriptions_server_endpoint: Option<String>,
-    subscriptions_server_jwt_to_connect: Option<String>,
+    use_subscriptions_server: bool,
+    subscriptions_server_hostname: Option<String>, // The real property actually does take an Option<String> for this one
+    subscriptions_server_port: Option<String>, // The real property actually does take an Option<String> for this one
+    subscriptions_server_endpoint: Option<String>, // The real property actually does take an Option<String> for this one
+    subscriptions_server_jwt_to_connect: Option<String>, // The real property actually does take an Option<String> for this one
     schema: Option<UserSchema<Q, M, S>>,
     jwt_secret: Option<String>,
     authentication_block_state: Option<AuthCheckBlockState>,
@@ -62,6 +63,7 @@ where
 
         Self {
             ctx: None,
+            use_subscriptions_server: false, // Most systems won't actually use subscriptions
             subscriptions_server_hostname: None,
             subscriptions_server_port: None,
             subscriptions_server_endpoint: None,
@@ -106,16 +108,25 @@ where
         });
         self
     }
+    // This shouldn't need to be called explicitly
+    // Whenever any of the functions that specify subscriptions server options are called, said server is automatically enabled
+    pub fn use_subscriptions_server(mut self) -> Self {
+        self.use_subscriptions_server = true;
+        self
+    }
     pub fn subscriptions_server_hostname(mut self, subscriptions_server_hostname: &str) -> Self {
         self.subscriptions_server_hostname = Some(subscriptions_server_hostname.to_string());
+        self.use_subscriptions_server = true;
         self
     }
     pub fn subscriptions_server_port(mut self, subscriptions_server_port: &str) -> Self {
         self.subscriptions_server_port = Some(subscriptions_server_port.to_string());
+        self.use_subscriptions_server = true;
         self
     }
     pub fn subscriptions_server_endpoint(mut self, subscriptions_server_endpoint: &str) -> Self {
         self.subscriptions_server_endpoint = Some(subscriptions_server_endpoint.to_string());
+        self.use_subscriptions_server = true;
         self
     }
     pub fn jwt_to_connect_to_subscriptions_server(
@@ -124,6 +135,7 @@ where
     ) -> Self {
         self.subscriptions_server_jwt_to_connect =
             Some(subscriptions_server_jwt_to_connect.to_string());
+        self.use_subscriptions_server = true;
         self
     }
     pub fn playground_endpoint(mut self, playground_endpoint: &str) -> Self {
@@ -140,19 +152,22 @@ where
     pub fn finish(self) -> Result<Options<C, Q, M, S>> {
         let opts = Options {
             ctx: self.ctx.ok_or(ErrorKind::IncompleteBuilderFields)?,
-            subscriptions_server_data: SubscriptionsServerInformation {
-                hostname: self
-                    .subscriptions_server_hostname
-                    .ok_or(ErrorKind::IncompleteBuilderFields)?,
-                port: self
-                    .subscriptions_server_port
-                    .ok_or(ErrorKind::IncompleteBuilderFields)?,
-                endpoint: self
-                    .subscriptions_server_endpoint
-                    .ok_or(ErrorKind::IncompleteBuilderFields)?,
-                jwt_to_connect: self
-                    .subscriptions_server_jwt_to_connect
-                    .ok_or(ErrorKind::IncompleteBuilderFields)?,
+            subscriptions_server_data: match self.use_subscriptions_server {
+                true => Some(SubscriptionsServerInformation {
+                    hostname: self
+                        .subscriptions_server_hostname
+                        .ok_or(ErrorKind::IncompleteBuilderFields)?,
+                    port: self
+                        .subscriptions_server_port
+                        .ok_or(ErrorKind::IncompleteBuilderFields)?,
+                    endpoint: self
+                        .subscriptions_server_endpoint
+                        .ok_or(ErrorKind::IncompleteBuilderFields)?,
+                    jwt_to_connect: self
+                        .subscriptions_server_jwt_to_connect
+                        .ok_or(ErrorKind::IncompleteBuilderFields)?,
+                }),
+                false => None,
             },
             schema: self.schema.ok_or(ErrorKind::IncompleteBuilderFields)?,
             jwt_secret: self.jwt_secret.ok_or(ErrorKind::IncompleteBuilderFields)?,

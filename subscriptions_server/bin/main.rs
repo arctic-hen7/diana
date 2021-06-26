@@ -35,7 +35,7 @@ async fn main() -> std::io::Result<()> {
         .finish()
         .expect("Options building failed!");
 
-    let configurer = create_subscriptions_server(opts);
+    let configurer = create_subscriptions_server(opts).expect("Failed to set up configurer.");
 
     HttpServer::new(move || App::new().configure(configurer.clone()))
         .bind("0.0.0.0:6000")? // This stays the same, that port in the container will get forwarded to whatever's configured in `.ports.env`

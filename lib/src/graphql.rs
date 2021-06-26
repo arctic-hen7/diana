@@ -74,7 +74,7 @@ where
 
 pub fn get_schema_without_subscriptions<C, Q, M, S>(
     user_schema: UserSchema<Q, M, S>,
-    subscription_server_info: SubscriptionsServerInformation,
+    subscription_server_info: Option<SubscriptionsServerInformation>,
     user_ctx: C,
 ) -> Result<Schema<Q, M, EmptySubscription>>
 where
@@ -90,21 +90,25 @@ where
         EmptySubscription,
     )
     // We add some custom user-defined context (e.g. a database connection pool)
-    .data(user_ctx)
-    // We add a publisher so we can communicate with the subscriptions server
-    .data(Publisher::new(
-        subscription_server_info.hostname,
-        subscription_server_info.port,
-        subscription_server_info.endpoint,
-        subscription_server_info.jwt_to_connect,
-    )?)
-    .finish();
+    .data(user_ctx);
+
+    // Conditionally extend that schema with a publisher if we're using a subscriptions server
+    let schema = match subscription_server_info {
+        Some(subscription_server_info) => schema
+            .data(Publisher::new(
+                subscription_server_info.hostname,
+                subscription_server_info.port,
+                subscription_server_info.endpoint,
+                subscription_server_info.jwt_to_connect,
+            )?)
+            .finish(),
+        None => schema.finish(),
+    };
 
     Ok(schema)
 }
 pub fn get_schema_for_subscriptions<C, Q, M, S>(
     user_schema: UserSchema<Q, M, S>,
-    _: SubscriptionsServerInformation, // Included for universality of arguments
     user_ctx: C,
 ) -> Schema<SubscriptionQuery, PublishMutation, S>
 where
