@@ -39,5 +39,5 @@ stop-subscriptions-server = "bonnie dc stop subscriptions-server"
 attach-subscriptions-server = "bonnie start-subscriptions-server && docker attach $(bonnie getcontainerid diana.subscriptions-server)"
 sh-subscriptions-server = { cmd = "bonnie dc run --entrypoint \"/bin/zsh\" -p %SUBSCRIPTIONS_SERVER_PORT:6000 --use-aliases --rm subscriptions-server", env_vars = ["SUBSCRIPTIONS_SERVER_PORT"] }
 
-# Releases the project to GitHub
-release = "standard-version && git push --follow-tags origin main"
+# Releases the project to GitHub and publishes the crate itself
+release = "standard-version --sign --commit-all && git push --follow-tags origin main && cargo publish"
