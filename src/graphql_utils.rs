@@ -10,31 +10,40 @@ use crate::pubsub::PubSub;
 /// a series of claims to check against, and code to execute if the user is authenticated. This will call [`bail!`] with an [`ErrorKind::Unauthorised`](crate::errors::ErrorKind::Unauthorised)
 /// error if the user is unauthenticated, so **that must be handled in you function's return type**!
 /// # Example
-/// This is a simplified version of the internal logic that published data to the subscriptions server.
+/// This is a simplified version of the internal logic that publishes data to the subscriptions server.
 /// ```
 /// use diana::{
-///     errors::Result,
-///     graphql_utils::get_auth_data_from_ctx
+///     errors::{Result, GQLResult},
+///     graphql_utils::get_auth_data_from_ctx,
+///     GQLObject,
+///     if_authed,
 /// };
-/// let auth_state = get_auth_data_from_ctx(raw_ctx)?;
-/// async fn publish(
-///     &self,
-///     raw_ctx: &async_graphql::Context<'_>,
-///     channel: String,
-///     data: String,
-/// ) -> Result<bool> {
-///     let auth_state = get_auth_data_from_ctx(raw_ctx)?;
-///     if_authed!(
-///         auth_state,
-///         {
-///             "role" => "graphql_server"
-///         },
-///         {
-///             // Your code here
-///             Ok(true)
-///         }
-///     )
+///
+/// #[derive(Default, Clone)]
+/// pub struct PublishMutation;
+/// #[GQLObject]
+/// impl PublishMutation {
+///     async fn publish(
+///         &self,
+///         raw_ctx: &async_graphql::Context<'_>,
+///         channel: String,
+///         data: String,
+///     ) -> Result<bool> {
+///         let auth_state = get_auth_data_from_ctx(raw_ctx)?;
+///         if_authed!(
+///             auth_state,
+///             {
+///                 "role" => "graphql_server"
+///             },
+///             {
+///                 // Your code here
+///                 Ok(true)
+///             }
+///         )
+///     }
 /// }
+///
+/// # fn main() {}
 /// ```
 #[macro_export]
 macro_rules! if_authed(
@@ -50,7 +59,7 @@ macro_rules! if_authed(
                 Some(auth_state) if auth_state.has_claims(test_claims) => {
                     $code
                 },
-                _ => crate::errors::bail!(crate::errors::ErrorKind::Unauthorised)
+                _ => $crate::errors::bail!($crate::errors::ErrorKind::Unauthorised)
             }
         }
      };
@@ -64,25 +73,41 @@ macro_rules! if_authed(
 /// ```
 /// use diana::{
 ///     stream,
-///     graphql_utils::get_stream_for_channel_from_ctx
+///     graphql_utils::get_stream_for_channel_from_ctx,
+///     errors::GQLResult,
+///     GQLSubscription, GQLSimpleObject,
 /// };
-/// async fn new_users(
-///     &self,
-///     raw_ctx: &async_graphql::Context<'_>,
-/// ) -> impl Stream<Item = Result<User, String>> {
-///     // Get a direct stream from the context on a certain channel
-///     let stream_result = get_stream_for_channel_from_ctx("new_user", raw_ctx);
-///     // We can manipulate the stream using the stream macro from async-stream
-///     stream! {
-///         // Unfortunately we can't get the stream in here, but we have to handle the error in here (try it if you want)
-///         let stream = stream_result?;
-///         for await message in stream {
-///             // Serialise the data as a user
-///             let new_user: User = serde_json::from_str(&message).map_err(|_err| "couldn't serialize given data correctly".to_string())?;
-///             yield Ok(new_user);
+/// use tokio::stream::{Stream, StreamExt};
+/// use serde::Deserialize;
+///
+/// #[derive(Deserialize, GQLSimpleObject)]
+/// struct User {
+///     username: String
+/// }
+///
+/// #[derive(Default, Clone)]
+/// pub struct Subscription;
+/// #[GQLSubscription]
+/// impl Subscription {
+///     async fn new_users(
+///         &self,
+///         raw_ctx: &async_graphql::Context<'_>,
+///     ) -> impl Stream<Item = GQLResult<User>> {
+///         // Get a direct stream from the context on a certain channel
+///         let stream_result = get_stream_for_channel_from_ctx("new_user", raw_ctx);
+///
+///         // We can manipulate the stream using the stream macro from async-stream
+///         stream! {
+///             let stream = stream_result?;
+///             for await message in stream {
+///                 // Serialise the data as a user
+///                 let new_user: User = serde_json::from_str(&message).map_err(|_err| "couldn't serialize given data correctly".to_string())?;
+///                 yield Ok(new_user);
+///             }
 ///         }
 ///     }
 /// }
+/// # fn main() {}
 /// ```
 ///
 pub fn get_stream_for_channel_from_ctx(

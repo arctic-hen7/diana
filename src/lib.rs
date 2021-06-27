@@ -64,5 +64,12 @@ pub use netlify_lambda_http::{
     lambda::{run as run_lambda, Context as LambdaCtx},
     IntoResponse as IntoLambdaResponse, Request as LambdaRequest,
 };
+// Users shouldn't have to install `async_graphql` themselves for basic usage
+pub use async_graphql::{
+    Object as GQLObject, Subscription as GQLSubscription,
+    SimpleObject as GQLSimpleObject, InputObject as GQLInputObject,
+    EmptyMutation, EmptySubscription, // In case the user doesn't have either or both
+    Context as GQLContext,
+};
 // Other stuff users shouldn't have to install for basic use
 pub use async_stream::stream; // The `stream!` macro

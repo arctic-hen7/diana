@@ -83,10 +83,9 @@ error_chain! {
 /// ```rust
 /// use diana::errors::GQLResult;
 ///
-/// async fn api_version(
-///     &self,
-/// ) -> GQLResult<String> {
+/// async fn api_version() -> GQLResult<String> {
 ///     // Your code here
+///     Ok("test".to_string())
 /// }
 /// ```
 pub type GQLResult<T> = async_graphql::Result<T>;
@@ -97,11 +96,10 @@ pub type GQLResult<T> = async_graphql::Result<T>;
 /// ```rust
 /// use diana::errors::{GQLResult, GQLError};
 ///
-/// async fn api_version(
-///     &self,
-/// ) -> GQLResult<String> {
+/// async fn api_version() -> GQLResult<String> {
 ///     let err = GQLError::new("Test error!");
 ///     // Your code here
+///     Err(err)
 /// }
 /// ```
 pub type GQLError = async_graphql::Error;

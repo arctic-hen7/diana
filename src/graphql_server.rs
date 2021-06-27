@@ -21,14 +21,58 @@ use crate::routes::graphql;
 /// Creates a configuration handler to create a new GraphQL server for queries and mutations.
 /// The resulting server **will not** support subscriptions, you should use [`create_subscriptions_server`](crate::create_subscriptions_server) for that.
 /// # Example
-/// ```
-/// use diana::{create_graphql_server, App, HttpServer};
-/// let configurer = create_graphql_server(opts).expect("Failed to set up configurer.");
+/// ```no_run
+/// use diana::{
+///     create_graphql_server, App, HttpServer,
+///     OptionsBuilder, AuthCheckBlockState,
+///     GQLObject, EmptySubscription,
+///     errors::GQLResult,
+/// };
 ///
-/// HttpServer::new(move || App::new().configure(configurer.clone()))
-///     .bind("0.0.0.0:7000")?
-///     .run()
-///     .await
+/// # #[derive(Default, Clone)]
+/// # pub struct Query {}
+/// # #[GQLObject]
+/// # impl Query {
+/// #     async fn api_version(&self) -> &str {
+/// #         "0.1.0"
+/// #     }
+/// # }
+/// # #[derive(Default, Clone)]
+/// # pub struct Mutation {}
+/// # #[GQLObject]
+/// # impl Mutation {
+/// #     async fn update_blah(&self) -> GQLResult<bool> {
+/// #         // Your code here
+/// #         Ok(true)
+/// #     }
+/// # }
+/// # #[derive(Clone)]
+/// # struct Context {
+/// #     pub pool: String // This might be an actual database pool
+/// # }
+///
+/// #[actix_web::main]
+/// async fn main() -> std::io::Result<()> {
+/// # let opts = OptionsBuilder::new()
+/// #     .ctx(Context {
+/// #         pool: "connection".to_string(),
+/// #     })
+/// #     .subscriptions_server_hostname("http://subscriptions-server")
+/// #     .subscriptions_server_port("6000")
+/// #     .subscriptions_server_endpoint("/graphql")
+/// #     .jwt_to_connect_to_subscriptions_server("blah")
+/// #     .auth_block_state(AuthCheckBlockState::AllowAll)
+/// #     .jwt_secret("blah")
+/// #     .schema(Query {}, Mutation {}, EmptySubscription {})
+/// #     // Endpoints are set up as `/graphql` and `/graphiql` automatically
+/// #     .finish()
+/// #     .expect("Options building failed!");
+///     let configurer = create_graphql_server(opts).expect("Failed to set up configurer.");
+///     HttpServer::new(move || App::new().configure(configurer.clone()))
+///         .bind("0.0.0.0:7000")?
+///         .run()
+///         .await
+/// }
 /// ```
 /// The result of this should (as in the above example) be used as an argument in `actix_web`'s `App.configure()` function. Diana re-exports
 /// the basics of Actix Web, so you don't have to install it for basic usage.

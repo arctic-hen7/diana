@@ -81,11 +81,37 @@ fn parse_aws_res(res: ServerlessResponse) -> Result<Response<String>, AwsError> 
 /// This just takes the entire Lambda request and does all the processing for you, but it's really just a wrapper around [run_serverless_req].
 /// You should use this function in your Lambda handler.
 /// # Example
-/// ```
+/// ```no_run
 /// use diana::{
 ///     create_handler, run_aws_req, run_lambda, AuthCheckBlockState, AwsError, IntoLambdaResponse,
 ///     LambdaCtx, LambdaRequest, OptionsBuilder,
+///     GQLObject, EmptySubscription,
+///     errors::GQLResult,
 /// };
+///
+/// #[derive(Default, Clone)]
+/// pub struct Query {}
+/// #[GQLObject]
+/// impl Query {
+///     async fn api_version(&self) -> &str {
+///         "0.1.0"
+///     }
+/// }
+///
+/// #[derive(Default, Clone)]
+/// pub struct Mutation {}
+/// #[GQLObject]
+/// impl Mutation {
+///     async fn update_blah(&self) -> GQLResult<bool> {
+///         // Your code here
+///         Ok(true)
+///     }
+/// }
+///
+/// #[derive(Clone)]
+/// struct Context {
+///     pub pool: Vec<String> // This might be an actual database pool
+/// }
 ///
 /// #[tokio::main]
 /// async fn main() -> Result<(), AwsError> {
@@ -96,7 +122,7 @@ fn parse_aws_res(res: ServerlessResponse) -> Result<Response<String>, AwsError> 
 /// async fn graphql(req: LambdaRequest, _: LambdaCtx) -> Result<impl IntoLambdaResponse, AwsError> {
 ///     let opts = OptionsBuilder::new()
 ///         .ctx(Context {
-///             pool: DbPool::default(),
+///             pool: vec!["connection 1".to_string(), "connection 2".to_string()],
 ///         })
 ///         .subscriptions_server_hostname("http://subscriptions-server")
 ///         .subscriptions_server_port("6000")
@@ -104,7 +130,7 @@ fn parse_aws_res(res: ServerlessResponse) -> Result<Response<String>, AwsError> 
 ///         .jwt_to_connect_to_subscriptions_server("blah")
 ///         .auth_block_state(AuthCheckBlockState::AllowAll)
 ///         .jwt_secret("blah")
-///         .schema(Query {}, Mutation {}, Subscription {})
+///         .schema(Query {}, Mutation {}, EmptySubscription {})
 ///         // Endpoints are set up as `/graphql` and `/graphiql` automatically
 ///         .finish()
 ///         .expect("Options building failed!");

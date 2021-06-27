@@ -60,8 +60,45 @@ impl Publisher {
     /// This function will return an error if the subscriptions server was unavailable or didn't correctly acknowledge the request.
     /// # Example
     /// ```
-    /// let publisher = ctx.data::<Publisher>()?; // Where `ctx` is the `async_graphql` context to a resolver.
-    /// publisher.publish("new_user", user_json.to_string()).await?;
+    /// use diana::{
+    ///     GQLObject, GQLInputObject, GQLSimpleObject,
+    ///     errors::GQLResult,
+    ///     Publisher,
+    /// };
+    /// use serde::Serialize;
+    ///
+    /// #[derive(Serialize, GQLSimpleObject)]
+    /// struct User {
+    ///     username: String,
+    /// }
+    /// #[derive(Serialize, GQLInputObject)]
+    /// struct UserInput {
+    ///     username: String,
+    /// }
+    ///
+    /// #[derive(Default, Clone)]
+    /// pub struct Mutation {}
+    /// #[GQLObject]
+    /// impl Mutation {
+    ///     async fn add_user(
+    ///         &self,
+    ///         ctx: &async_graphql::Context<'_>,
+    ///         new_user: UserInput,
+    ///     ) -> GQLResult<User> {
+    ///         // Your code to add the new user
+    ///
+    ///         // Notify the subscriptions server that a new user has been added
+    ///         let publisher = ctx.data::<Publisher>()?;
+    ///         let user_json = serde_json::to_string(&new_user).unwrap(); // GraphQL has already checked for ill-formation
+    ///         publisher.publish("new_user", user_json.to_string()).await?;
+    ///
+    ///         Ok(User {
+    ///             username: new_user.username
+    ///         }) // In reality, you'd probably return the user that's just been created
+    ///     }
+    /// }
+    ///
+    /// # fn main() {}
     /// ```
     pub async fn publish(&self, channel: &str, data: String) -> Result<()> {
         let client = &self.client;
