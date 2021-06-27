@@ -8,7 +8,7 @@ use crate::pubsub::PubSub;
 
 /// Checks to see if the given authentication state matches the series of given claims. This must be provided with the authentication state,
 /// a series of claims to check against, and code to execute if the user is authenticated. This will call [`bail!`] with an [`ErrorKind::Unauthorised`](crate::errors::ErrorKind::Unauthorised)
-/// error if the user is unauthenticated, so **that must be handled in you function's return type**!
+/// error if the user is unauthenticated, so **that must be handled in your function's return type**!
 /// # Example
 /// This is a simplified version of the internal logic that publishes data to the subscriptions server.
 /// ```
