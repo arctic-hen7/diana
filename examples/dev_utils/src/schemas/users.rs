@@ -9,8 +9,8 @@ use tokio::stream::{Stream, StreamExt};
 // Note that we don't use `error_chain` here, just the GraphQL errors system
 use lib::errors::{GQLError, GQLResult};
 use lib::graphql_utils::get_stream_for_channel_from_ctx;
-use lib::Publisher;
 use lib::stream;
+use lib::Publisher;
 
 use crate::ctx::get_client_from_ctx;
 use crate::oid::ObjectId;
