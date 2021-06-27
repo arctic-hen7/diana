@@ -60,18 +60,12 @@ COPY ./examples/subscriptions_server/Cargo.toml examples/subscriptions_server/Ca
 # We'll be root to make all the directories
 USER root
 RUN mkdir -p /app/.cargo
-RUN mkdir -p /app/examples/dev_utils/.cargo
-RUN mkdir -p /app/examples/graphql_server/.cargo
-RUN mkdir -p /app/examples/graphql_serverless/.cargo
-RUN mkdir -p /app/examples/subscriptions_server/.cargo
+RUN mkdir -p /app/examples/.cargo
 RUN chown -Rh node:node /app
 USER node
 
 RUN /home/node/.cargo/bin/cargo vendor > .cargo/config
-RUN cd /app/examples/dev_utils && /home/node/.cargo/bin/cargo vendor > .cargo/config
-RUN cd /app/examples/graphql_server && /home/node/.cargo/bin/cargo vendor > .cargo/config
-RUN cd /app/examples/graphql_serverless && /home/node/.cargo/bin/cargo vendor > .cargo/config
-RUN cd /app/examples/subscriptions_server && /home/node/.cargo/bin/cargo vendor > .cargo/config
+RUN cd /app/examples && /home/node/.cargo/bin/cargo vendor > .cargo/config
 # Switch back to root for the remaining stages
 USER root
 

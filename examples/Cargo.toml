@@ -1,0 +1,17 @@
+[workspace]
+members = [
+    "dev_utils",
+    "graphql_server",
+    "graphql_serverless",
+    "subscriptions_server"
+]
+
+# This is all optimisation for the release binaries, mainly targeted at the serverless package
+# Netlify unfortunately doesn't like 20MB executables
+# These drive up release compilation time significantly, but decrease binary size hugely
+# Also decreases binary speed, but that's okay for Netlify because otherwise we'd be writing in JS (which would be atrocious)
+# Unfortunately, we can't apply the `lto = true` optimisation because then Netlify doesn't recognise the bianry as a function
+[profile.release]
+opt-level = "z"
+codegen-units = 1
+panic = "abort"
