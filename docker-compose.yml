@@ -10,7 +10,7 @@ services:
             # Binds your app code into the container so changes you make are reflected instantly
             - type: bind
               source: ./
-              target: /APP_PORT
+              target: /app
         # Allows this container to be accessed with a terminal for debugging
         stdin_open: true
         tty: true
