@@ -1,19 +1,27 @@
-# Managing the API with workspaces allows us to run multiple systems in parallel
-[workspace]
-members = [
-    "lib", # The actual module itself
-    "graphql_server", # Testing of the query/mutation serverful system
-    "graphql_serverless", # Testing of the query/mutation serverless system
-    "subscriptions_server", # Testing of the subscription server
-    "dev_utils" # The DB logic etc. for testing in a realistic way
-]
+[package]
+name = "diana"
+version = "0.1.0"
+authors = ["arctic_hen7 <arctic_hen7@pm.me>"]
+edition = "2018"
 
-# This is all optimisation for the release binaries, mainly targeted at the serverless package
-# Netlify unfortunately doesn't like 20MB executables
-# These drive up release compilation time significantly, but decrease binary size hugely
-# Also decreases binary speed, but that's okay for Netlify because otherwise we'd be writing in JS (which would be atrocious)
-# Unfortunately, we can't apply the `lto = true` optimisation because then Netlify doesn't recognise the bianry as a function
-[profile.release]
-opt-level = "z"
-codegen-units = 1
-panic = "abort"
+[dependencies]
+serde = "1.0.103"
+serde_json = "1.0.44"
+serde_derive = "1.0.103"
+tokio = { version = "0.2.25", features = ["full"] } # `mongodb` needs an 0.2.x version
+async-graphql = "2.8.2"
+async-graphql-actix-web = "2.8.2"
+actix-web = "3.3.2"
+futures = "0.3.14"
+reqwest = { version = "0.10.10", default-features = false, features = ["rustls-tls", "json"] }
+async-stream = "0.3.1"
+tokio-stream = "0.1.5"
+error-chain = "0.12.4"
+jsonwebtoken = "7.2.0"
+chrono = "0.4.19"
+netlify_lambda_http = "0.2.0"
+aws_lambda_events = "0.4.0"
+
+[lib]
+name = "lib"
+path = "src/lib.rs"

@@ -6,15 +6,11 @@ services:
         build:
             context: ./
             target: playground # We use the playground stage of the Dockerfile so we get a terminal prompt
-        ports:
-            - "127.0.0.1:${APP_PORT}:8000" # Anything running on 0.0.0.0:8000 in the container gets forwarded to localhost:${APP_PORT} on the host
         volumes:
             # Binds your app code into the container so changes you make are reflected instantly
             - type: bind
               source: ./
-              target: /app
-        depends_on:
-            - db # The DB must be started before this container can come up
+              target: /APP_PORT
         # Allows this container to be accessed with a terminal for debugging
         stdin_open: true
         tty: true
@@ -82,7 +78,7 @@ services:
         container_name: diana.db
         ports:
             - "127.0.0.1:${DB_PORT}:27017" # Anything running on 0.0.0.0:27017 in the container gets forwarded to localhost:${APP_PORT} on the host
-        env_file: ./.env.local # DB credentials stored in the API secrets file are used to initialise the DB with a username and password
+        env_file: examples/.env.local # DB credentials stored in the API secrets file are used to initialise the DB with a username and password
         # Set up an internal Docker volume for the MongoDB data so that it persists across container restarts (stored internally by Docker)
         volumes:
             - "db-data:/data/db"
