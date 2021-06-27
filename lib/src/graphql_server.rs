@@ -18,6 +18,20 @@ use crate::graphql::get_schema_without_subscriptions;
 use crate::options::{AuthCheckBlockState, Options};
 use crate::routes::graphql;
 
+/// Creates a configuration handler to create a new GraphQL server for queries and mutations.
+/// The resulting server **will not** support subscriptions, you should use [crate::create_subscriptions_server] for that.
+/// # Example
+/// ```
+/// use diana::{create_graphql_server, App, HttpServer};
+/// let configurer = create_graphql_server(opts).expect("Failed to set up configurer.");
+///
+/// HttpServer::new(move || App::new().configure(configurer.clone()))
+///     .bind("0.0.0.0:7000")?
+///     .run()
+///     .await
+/// ```
+/// The result of this should (as in the above example) be used as an argument in `actix_web`'s `App.configure()` function. Diana re-exports
+/// the basics of Actix Web, so you don't have to install it for basic usage.
 pub fn create_graphql_server<C, Q, M, S>(
     opts: Options<C, Q, M, S>,
 ) -> Result<impl FnOnce(&mut ServiceConfig) + Clone>

@@ -99,12 +99,28 @@ pub fn get_auth_verdict(
     }
 }
 
-// The block state chosen may have unforseen security implications, please choose wisely!
+/// An enum for the level of blocking imposed on a particular endpoint.
+/// Your choice on this should be carefully evaluated based on your threat model. Please choose wisely!
 #[derive(Debug, Clone, Copy)]
 pub enum AuthCheckBlockState {
-    AllowAll, // Allows anything through, adding the auth parameters to the request for later processing
-    BlockUnauthenticated, // Blocks missing/invalid tokens (all requests must be authenticated)
-    AllowMissing, // Only block if an invalid token is given (if no token, allowed)
+    /// Allows anything through.
+    /// - Valid token   -> allow
+    /// - Invalid token -> allow
+    /// - Missing token -> allow
+    AllowAll,
+    /// Blocks eveything except requests with valid tokens.
+    /// Note that, with this setting, introspection will be impossible in the GraphiQL playground. You may want to use `AllowMissing` in development
+    /// and then this in production (see the book).
+    /// - Valid token   -> allow
+    /// - Invalid token -> block
+    /// - Missing token -> block
+    BlockUnauthenticated,
+    /// Allows requests with valid tokens or no token at all. Only blocks requests that specify an invalid token.
+    /// This is mostly useful for development to enable introspection in the GraphiQL playground (see the book).
+    /// - Valid token   -> allow
+    /// - Invalid token -> block
+    /// - Missing token -> allow
+    AllowMissing,
 }
 
 // Create a factory for authentication middleware

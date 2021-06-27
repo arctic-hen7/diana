@@ -40,6 +40,18 @@ pub fn get_jwt_secret<'a>(secret_str: String) -> Result<JWTSecret<'a>> {
  *      M: month (30 days used here, 12M =/= 1y!),
  *      y: year (365 days always, leap years ignored, if you want them add them as days)
  */
+/// Decodes time strings like '1w' into actual datetimes from the present moment. If you've ever used Node's `jsonwebtoken` module, this is
+/// very similar (based on Vercel's `ms` module for JavaScript).
+/// Accepts strings of the form 'xXyYzZ...', where the lower-case letters are numbers meaning a number of the intervals X/Y/Z (e.g. 1m4d -- one month four days).
+/// The available intervals are:
+///
+/// - s: second,
+/// - m: minute,
+/// - h: hour,
+/// - d: day,
+/// - w: week,
+/// - M: month (30 days used here, 12M =/= 1y!),
+/// - y: year (365 days always, leap years ignored, if you want them add them as days)
 pub fn decode_time_str(time_str: &str) -> Result<u64> {
     let mut duration_after_current = Duration::zero();
     // Get the current datetime since Unix epoch, we'll add to that
@@ -76,6 +88,8 @@ pub fn decode_time_str(time_str: &str) -> Result<u64> {
     Ok(datetime.timestamp() as u64) // As Unix timestamp
 }
 
+/// Creates a new JWT. You should use this to issue all client JWTs and create the initial JWT for communication with the subscriptions
+/// server (more information in the book).
 pub fn create_jwt(
     user_claims: HashMap<String, String>,
     secret: &JWTSecret,
@@ -95,6 +109,8 @@ pub fn create_jwt(
     Ok(token)
 }
 
+/// Validates a JWT and returns the payload. All client JWTs are automatically validated and their payloads are sent (parsed) to your resolvers,
+/// but if you have a system on top of that you'll want to use this function (not required for normal Diana usage though).
 pub fn validate_and_decode_jwt(jwt: &str, secret: &JWTSecret) -> Option<Claims> {
     let decoded = decode::<Claims>(
         jwt,

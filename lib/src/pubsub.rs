@@ -27,12 +27,16 @@ struct PublishResponse {
     publish: bool,
 }
 
+/// The system that publishes data from the queries/mutations system to the subscriptions server.
+/// These communications are secured by a JWT specified in [crate::Options].
+/// This is automatically created from the [crate::Options] and passed to all resolvers. You should never need to manually create it.
 pub struct Publisher {
     client: Client,
     address: String,
     token: String,
 }
 impl Publisher {
+    /// Creates a new publisher. This is done for you when you create the queries/mutations system, so you should never need to call this.
     pub fn new(hostname: String, port: String, endpoint: String, token: String) -> Result<Self> {
         let address = format!(
             "{hostname}:{port}{endpoint}", // The endpoint should start with '/'
@@ -50,8 +54,15 @@ impl Publisher {
         })
     }
 
-    // Sends the publish mutation to the subscriptions server
-    // This is just done with Reqwest because we need no complex logic here
+    /// Sends the given data to the subscriptions server on the given channel. In-depth information about this process is available in the book.
+    /// You should use [serde] to serialize anything sent here as a string (this won't be done for you). It should then be deserialized in the
+    /// appropriate subscription (which will listen for messages from here indirectly).
+    /// This function will return an error if the subscriptions server was unavailable or didn't correctly acknowledge the request.
+    /// # Example
+    /// ```
+    /// let publisher = ctx.data::<Publisher>()?; // Where `ctx` is the `async_graphql` context to a resolver.
+    /// publisher.publish("new_user", user_json.to_string()).await?;
+    /// ```
     pub async fn publish(&self, channel: &str, data: String) -> Result<()> {
         let client = &self.client;
 
@@ -100,6 +111,7 @@ impl Publisher {
 // Do NOT import these mechanisms in the serverless system!
 
 // This is a traditional PubSub implementation using Tokio's broadcast system
+// This doesn't need to be made available because it's entirely internal
 pub struct PubSub {
     // A hash map of channels to their Tokio broadcasters
     channels: HashMap<String, Sender<String>>,
@@ -146,7 +158,7 @@ impl PubSub {
     pub fn publish(&mut self, channel: &str, data: String) {
         let channel_sender = self.get_channel(channel);
         // This will fail only if there are now receivers, but we don't care if that's the case
-        channel_sender.send(data);
+        let _ = channel_sender.send(data);
     }
 
     // Drops the handle to a sender for the given channel

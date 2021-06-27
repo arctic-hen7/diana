@@ -1,4 +1,5 @@
 #![forbid(unsafe_code)]
+#![deny(missing_docs)]
 
 /*!
 Diana is an out-of-the-box fully-fledged GraphQL system with inbuilt support for commonly-used features like subscriptions and authentication.
@@ -33,9 +34,12 @@ diana = "0.1.0"
 
 mod auth;
 mod aws_serverless;
+/// The module for errors and results. This uses [error_chain] behind the scenes.
+/// You'll also find [crate::errors::GQLResult] and [crate::errors::GQLError] in here, which may be useful in working with your own resolvers.
 pub mod errors;
 mod graphql;
 mod graphql_server;
+/// The module for utility functions useful when developing your own schemas.
 pub mod graphql_utils; // Users need to be able to access these of course in their schemas
 mod options;
 mod pubsub;
@@ -50,6 +54,7 @@ pub use crate::options::{AuthCheckBlockState, Options, OptionsBuilder};
 pub use crate::pubsub::Publisher;
 pub use crate::serverless::{run_serverless_req, ServerlessResponse};
 pub use crate::subscriptions_server::create_subscriptions_server;
+pub use crate::auth::jwt::{create_jwt, decode_time_str, validate_and_decode_jwt};
 
 // Users shouldn't have to install Actix Web themselves for basic usage
 pub use actix_web::{App, HttpServer};
@@ -59,3 +64,5 @@ pub use netlify_lambda_http::{
     lambda::{run as run_lambda, Context as LambdaCtx},
     IntoResponse as IntoLambdaResponse, Request as LambdaRequest,
 };
+// Other stuff users shouldn't have to install for basic use
+pub use async_stream::stream; // The `stream!` macro

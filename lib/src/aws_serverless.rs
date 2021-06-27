@@ -8,7 +8,7 @@ use std::any::Any;
 use crate::options::Options;
 use crate::serverless::{run_serverless_req, ServerlessResponse};
 
-// A generic error type that the lambda will accept
+/// A *very* generic error type that the lambda will accept as a return type.
 pub type AwsError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 // This allows us to propagate error HTTP responses more easily
@@ -77,6 +77,42 @@ fn parse_aws_res(res: ServerlessResponse) -> Result<Response<String>, AwsError> 
     Ok(res)
 }
 
+/// Runs a request for AWS Lambda or its derivatives (e.g. Netlify).
+/// This just takes the entire Lambda request and does all the processing for you, but it's really just a wrapper around [run_serverless_req].
+/// You should use this function in your Lambda handler.
+/// # Example
+/// ```
+/// use diana::{
+///     create_handler, run_aws_req, run_lambda, AuthCheckBlockState, AwsError, IntoLambdaResponse,
+///     LambdaCtx, LambdaRequest, OptionsBuilder,
+/// };
+///
+/// #[tokio::main]
+/// async fn main() -> Result<(), AwsError> {
+///     run_lambda(create_handler(graphql)).await?;
+///     Ok(())
+/// }
+///
+/// async fn graphql(req: LambdaRequest, _: LambdaCtx) -> Result<impl IntoLambdaResponse, AwsError> {
+///     let opts = OptionsBuilder::new()
+///         .ctx(Context {
+///             pool: DbPool::default(),
+///         })
+///         .subscriptions_server_hostname("http://subscriptions-server")
+///         .subscriptions_server_port("6000")
+///         .subscriptions_server_endpoint("/graphql")
+///         .jwt_to_connect_to_subscriptions_server("blah")
+///         .auth_block_state(AuthCheckBlockState::AllowAll)
+///         .jwt_secret("blah")
+///         .schema(Query {}, Mutation {}, Subscription {})
+///         // Endpoints are set up as `/graphql` and `/graphiql` automatically
+///         .finish()
+///         .expect("Options building failed!");
+///
+///     let res = run_aws_req(req, opts).await?;
+///     Ok(res)
+/// }
+/// ```
 pub async fn run_aws_req<C, Q, M, S>(
     req: Request,
     opts: Options<C, Q, M, S>,

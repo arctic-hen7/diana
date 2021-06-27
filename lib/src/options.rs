@@ -8,7 +8,9 @@ pub use crate::auth::middleware::AuthCheckBlockState; // Users should be able to
 use crate::errors::*;
 pub use crate::graphql::{SubscriptionsServerInformation, UserSchema};
 
-// Options to create a GraphQL server
+/// The options for creating the normal server, subscriptions server, and serverless function.
+/// You should define your options in one file and then import them everywhere you need them.
+/// You should use [OptionsBuilder] to construct this.
 #[derive(Clone)]
 pub struct Options<C, Q, M, S>
 where
@@ -17,16 +19,29 @@ where
     M: Clone + ObjectType + 'static,
     S: Clone + SubscriptionType + 'static,
 {
-    pub ctx: C, // The user's custom context, often a database connection pool
-    pub subscriptions_server_data: Option<SubscriptionsServerInformation>, // Some systems may not actually use a subscriptions server
-    pub schema: UserSchema<Q, M, S>, // The schema the user defines
-    pub jwt_secret: String, // This allows checking client tokens (should be different to the subscription server's secret)
-    pub authentication_block_state: AuthCheckBlockState, // The level of blocking that will be used for the endpoint
-    pub playground_endpoint: Option<String>, // The endpoint for GraphiQL (if None, no playground will be created)
-    pub graphql_endpoint: String,            // The endpoint for GraphQL itself
+    /// Your custom context, often a database connection pool
+    pub ctx: C,
+    /// Data about the subscriptions server
+    /// If you're not using subscriptions at all, the mechanics to connect to such a server will be disabled automatically.
+    pub subscriptions_server_data: Option<SubscriptionsServerInformation>,
+    /// Your `async_graphql` schema. See the book for details on how to create a schema.
+    pub schema: UserSchema<Q, M, S>,
+    /// The JWT secret for authenticating and generating client tokens and communications with the subscriptions server.
+    /// This should be stored in an environment variable and randomly generated (see the book).
+    pub jwt_secret: String,
+    /// The blocking level that will be used for the GraphQL endpoint.
+    /// See [AuthCheckBlockState] for available blocklevels and their meanings.
+    /// The default here is to block anything that is not authenticated.
+    pub authentication_block_state: AuthCheckBlockState,
+    /// The endpoint for the GraphiQL playground.
+    /// If nothing is provided here, the playground will be disabled.
+    /// Use with great care in production!
+    pub playground_endpoint: Option<String>,
+    /// The GraphQL endpoint location. By default `/graphql`.
+    pub graphql_endpoint: String,
 }
 
-// A builder for the options to be provided to the GraphQL server creator
+/// A builder-style struct to create an instance of [Options] idiomatically.
 #[derive(Clone)]
 pub struct OptionsBuilder<C, Q, M, S>
 where
@@ -83,23 +98,33 @@ where
     M: Clone + ObjectType + 'static,
     S: Clone + SubscriptionType + 'static,
 {
+    /// Creates a new builder. You'll need to then call the other methods to set everything up.
     pub fn new() -> Self {
         Self::default()
     }
 
     // Here begin the functions to build the options
+    /// Defines the context to pass to all GraphQL resolvers. This is typically a database pool, but it can really be anything that can
+    /// be safely sent between threads.
+    /// If you don't want to use context, you'll need to set something here anyway (for now).
     pub fn ctx(mut self, ctx: C) -> Self {
         self.ctx = Some(ctx);
         self
     }
+    /// Defines the JWt secret that will be used to authenticate client tokens and communication with the subscriptions server.
+    /// This should be randomly generated (see the book).
     pub fn jwt_secret(mut self, jwt_secret: &str) -> Self {
         self.jwt_secret = Some(jwt_secret.to_string());
         self
     }
+    /// Defines the blocklevel for the GraphQL endpoint. See [AuthCheckBlockState] for more details.
     pub fn auth_block_state(mut self, authentication_block_state: AuthCheckBlockState) -> Self {
         self.authentication_block_state = Some(authentication_block_state);
         self
     }
+    /// Defines your custom schema.
+    /// The query/mutation roots will be inserted into the queries/mutations server/function and the subscription root will be inserted
+    /// into the subscriptions server. These should be specified using `async_graphql` as per the book.
     pub fn schema(mut self, query_root: Q, mutation_root: M, subscription_root: S) -> Self {
         self.schema = Some(UserSchema {
             query_root,
@@ -108,27 +133,33 @@ where
         });
         self
     }
-    // This shouldn't need to be called explicitly
-    // Whenever any of the functions that specify subscriptions server options are called, said server is automatically enabled
+    /// Explicitly enables the subscriptions server. You shouldn't every need to call this, as calling any methods that define settings
+    /// for the subscriptions server will automatically enable it.
     pub fn use_subscriptions_server(mut self) -> Self {
         self.use_subscriptions_server = true;
         self
     }
+    /// Defines the hsotname on which the subscriptions server will be contacted.
     pub fn subscriptions_server_hostname(mut self, subscriptions_server_hostname: &str) -> Self {
         self.subscriptions_server_hostname = Some(subscriptions_server_hostname.to_string());
         self.use_subscriptions_server = true;
         self
     }
+    /// Defines the port on which the subscriptions server will be contacted.
     pub fn subscriptions_server_port(mut self, subscriptions_server_port: &str) -> Self {
         self.subscriptions_server_port = Some(subscriptions_server_port.to_string());
         self.use_subscriptions_server = true;
         self
     }
+    /// Defines the GraphQL endpoint for the subscriptions server.
+    /// The GraphiQL playground endpoint inherits from the `.playground_endpoint()` setting.
     pub fn subscriptions_server_endpoint(mut self, subscriptions_server_endpoint: &str) -> Self {
         self.subscriptions_server_endpoint = Some(subscriptions_server_endpoint.to_string());
         self.use_subscriptions_server = true;
         self
     }
+    /// Specifies the JWT which will be used by the queries/mutations system to connect to the subscriptions server.
+    /// This should be generated based off the same secret as you specify for the queries/mutations system (TODO security review of that architecture).
     pub fn jwt_to_connect_to_subscriptions_server(
         mut self,
         subscriptions_server_jwt_to_connect: &str,
@@ -138,17 +169,22 @@ where
         self.use_subscriptions_server = true;
         self
     }
+    /// Defines the GraphiQL playground endpoint.
+    /// In development, this is not required and will default to `/graphiql`.
+    /// In production, the playground will be disabled by default (and should only be enabled with great caution!).
     pub fn playground_endpoint(mut self, playground_endpoint: &str) -> Self {
         self.playground_endpoint = Some(playground_endpoint.to_string());
         self
     }
+    /// Defines the GraphQL endpoint. This is not required, and defaults to `/graphql`.
     pub fn graphql_endpoint(mut self, graphql_endpoint: &str) -> Self {
         self.graphql_endpoint = Some(graphql_endpoint.to_string());
         self
     }
     // Here end the functions to build the options
 
-    // Builds the final options, consuming self
+    /// Builds the final options, consuming `self`.
+    /// This will return an error if you haven't set something required up.
     pub fn finish(self) -> Result<Options<C, Q, M, S>> {
         let opts = Options {
             ctx: self.ctx.ok_or(ErrorKind::IncompleteBuilderFields)?,

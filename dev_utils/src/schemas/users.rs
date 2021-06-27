@@ -2,7 +2,6 @@ use async_graphql::{
     InputObject as GQLInputObject, Object as GQLObject, SimpleObject as GQLSimpleObject,
     Subscription as GQLSubscription,
 };
-use async_stream::stream;
 use mongodb::{bson::doc, Client as MongoClient, Collection};
 use serde::{Deserialize, Serialize};
 use tokio::stream::{Stream, StreamExt};
@@ -11,6 +10,7 @@ use tokio::stream::{Stream, StreamExt};
 use lib::errors::{GQLError, GQLResult};
 use lib::graphql_utils::get_stream_for_channel_from_ctx;
 use lib::Publisher;
+use lib::stream;
 
 use crate::ctx::get_client_from_ctx;
 use crate::oid::ObjectId;
@@ -114,12 +114,13 @@ impl Subscription {
     async fn new_users(
         &self,
         raw_ctx: &async_graphql::Context<'_>,
-    ) -> impl Stream<Item = Result<User, String>> {
+    ) -> impl Stream<Item = GQLResult<User>> {
         // Get a direct stream from the context on a certain channel
-        let stream = get_stream_for_channel_from_ctx("new_user", raw_ctx);
+        let stream_result = get_stream_for_channel_from_ctx("new_user", raw_ctx);
 
         // We can manipulate the stream using the stream macro from async-stream
         stream! {
+            let stream = stream_result?;
             for await message in stream {
                 // Serialise the data as a user
                 let new_user: User = serde_json::from_str(&message).map_err(|_err| "couldn't serialize given data correctly".to_string())?;
