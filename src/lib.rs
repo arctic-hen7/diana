@@ -35,7 +35,7 @@ diana = "0.1.0"
 mod auth;
 mod aws_serverless;
 /// The module for errors and results. This uses [error_chain] behind the scenes.
-/// You'll also find [crate::errors::GQLResult] and [crate::errors::GQLError] in here, which may be useful in working with your own resolvers.
+/// You'll also find [`GQLResult`](crate::errors::GQLResult) and [`GQLError`](crate::errors::Error) in here, which may be useful in working with your own resolvers.
 pub mod errors;
 mod graphql;
 mod graphql_server;

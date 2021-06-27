@@ -22,8 +22,8 @@ use crate::routes::{graphql, graphql_ws};
 use crate::errors::*;
 
 /// Creates a configuration handler to create a new GraphQL server for subscriptions.
-/// The resulting server **will not** support your queries and mutations, you should use [crate::create_graphql_server] for that. It will however
-/// expose a `publish` mutation that [crate::Publisher] automatically works with.
+/// The resulting server **will not** support your queries and mutations, you should use [`create_graphql_server`](crate::create_graphql_server) for that. It will however
+/// expose a `publish` mutation that [`Publisher`](crate::Publisher) automatically works with.
 /// # Example
 /// ```
 /// use diana::{create_subscriptions_server, App, HttpServer};

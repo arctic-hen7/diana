@@ -10,7 +10,7 @@ use crate::graphql::get_schema_without_subscriptions;
 use crate::options::Options;
 
 /// The response from a generic serverless request invocation. This is the primitive you'll likely process into some kind of custom response
-/// if you're not using AWS Lambda or one of its derivatives (e.g. Netlify). If you are, use [crate::run_aws_req] and ignore this!
+/// if you're not using AWS Lambda or one of its derivatives (e.g. Netlify). If you are, use [run_aws_req](crate::run_aws_req) and ignore this!
 pub enum ServerlessResponse {
     /// The request was successful and the response is attached.
     /// Return a 200.
@@ -29,7 +29,7 @@ pub enum ServerlessResponse {
 // If you're using AWS or a derivative (like Netlify), you can use `run_lambda_req` instead for greater convenience
 
 /// Runs a GraphQL query/mutation in a serverless function. This is deliberately as general as possible so we support basically every serverless
-/// function provider. If you're using AWS Lambda or one of its derivatives (e.g. Netlify), you can use [crate::run_aws_req] instead for greater
+/// function provider. If you're using AWS Lambda or one of its derivatives (e.g. Netlify), you can use [run_aws_req](crate::run_aws_req) instead for greater
 /// convenience.
 /// There are no examples for the usage of this function because it's a primitive. Just provide a request body (which should contain the query,
 /// variables, etc.) and the HTTP `Authorization` header. You don't need to do any further processing, this function will do the rest.

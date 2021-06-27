@@ -28,8 +28,8 @@ struct PublishResponse {
 }
 
 /// The system that publishes data from the queries/mutations system to the subscriptions server.
-/// These communications are secured by a JWT specified in [crate::Options].
-/// This is automatically created from the [crate::Options] and passed to all resolvers. You should never need to manually create it.
+/// These communications are secured by a JWT specified in [`Options`](crate::Options).
+/// This is automatically created from the [`Options`](crate::Options) and passed to all resolvers. You should never need to manually create it.
 pub struct Publisher {
     client: Client,
     address: String,

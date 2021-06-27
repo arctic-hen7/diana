@@ -19,7 +19,7 @@ use crate::options::{AuthCheckBlockState, Options};
 use crate::routes::graphql;
 
 /// Creates a configuration handler to create a new GraphQL server for queries and mutations.
-/// The resulting server **will not** support subscriptions, you should use [crate::create_subscriptions_server] for that.
+/// The resulting server **will not** support subscriptions, you should use [`create_subscriptions_server`](crate::create_subscriptions_server) for that.
 /// # Example
 /// ```
 /// use diana::{create_graphql_server, App, HttpServer};
