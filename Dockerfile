@@ -46,26 +46,15 @@ FROM dependencies AS rust-cacher
 USER node
 RUN mkdir -p /app \
     && chown -R node:node /app
-# Copy the Cargo configuration files into the correct place in the container (for each example as well as the main library)
+# Copy the Cargo configuration files into the correct place in the container
 # Note that we need to be able to write to Cargo.lock
 WORKDIR /app
 COPY --chown=node:node ./Cargo.lock Cargo.lock
 COPY ./Cargo.toml Cargo.toml
-
-COPY ./examples/dev_utils/Cargo.toml examples/dev_utils/Cargo.toml
-COPY ./examples/graphql_server/Cargo.toml examples/graphql_server/Cargo.toml
-COPY ./examples/graphql_serverless/Cargo.toml examples/graphql_serverless/Cargo.toml
-COPY ./examples/subscriptions_server/Cargo.toml examples/subscriptions_server/Cargo.toml
-# Vendor all dependencies (stores them all locally, meaning they can be cached) (for each example as well as the main library)
-# We'll be root to make all the directories
-USER root
+# Vendor all dependencies (stores them all locally, meaning they can be cached)
 RUN mkdir -p /app/.cargo
-RUN mkdir -p /app/examples/.cargo
-RUN chown -Rh node:node /app
-USER node
-
+RUN chown -Rh node:node /app/.cargo
 RUN /home/node/.cargo/bin/cargo vendor > .cargo/config
-RUN cd /app/examples && /home/node/.cargo/bin/cargo vendor > .cargo/config
 # Switch back to root for the remaining stages
 USER root
 
@@ -75,29 +64,12 @@ WORKDIR /app
 # Disable telemetry of various tools for privacy
 RUN yarn config set --home enableTelemetry 0
 # Copy the Netlify config file into the correct location
+# See `CONTRIBUTING.md` for how to set this up for the first time
 COPY --chown=node:node ./netlify-config.json /home/node/.config/netlify/config.json
 # Copy our source code into the container
 COPY . .
 
-# Playground stage - simple ZSH entrypoint for us to shell into the container as the non-root user (enters in `/app`)
+# Playground stage - simple ZSH entrypoint for us to shell into the container as the non-root user for developing the main library
 FROM base AS playground
 USER node
 ENTRYPOINT [ "/bin/zsh" ]
-
-# Server stage - runs the GraphQL server
-FROM base AS server
-USER node
-WORKDIR /app/examples/graphql_server
-ENTRYPOINT [ "/bin/zsh", "-c", "cargo watch -w . -w ../../src -w ../dev_utils -x \"run\"" ]
-
-# Serverless stage - runs the GraphQL serverless systems
-FROM base AS serverless
-USER node
-WORKDIR /app/examples/graphql_serverless
-ENTRYPOINT [ "/bin/zsh", "-c", "cargo watch -w . -w ../../src -w ../dev_utils -x \"run\"" ]
-
-# Subscriptions server stage - runs the GraphQL subscriptions server
-FROM base AS subscriptions_server
-USER node
-WORKDIR /app/examples/subscriptions_server
-ENTRYPOINT [ "/bin/zsh", "-c", "cargo watch -w . -w ../../src -w ../dev_utils -x \"run\"" ]

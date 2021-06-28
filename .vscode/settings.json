@@ -2,6 +2,7 @@
 	"conventionalCommits.scopes": [
 		"docker",
 		"auth",
-		"deps"
+		"deps",
+		"examples"
 	]
 }

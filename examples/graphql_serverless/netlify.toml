@@ -1,6 +1,0 @@
-[build]
-publish = "public"
-functions = "functions"
-
-# We don't set up a `dev` block because Netlify Dev does not yet support Rust functions
-# We have to deploy live to the cloud to see changes (growl.)
