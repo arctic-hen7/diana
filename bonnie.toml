@@ -14,17 +14,14 @@ dc = "docker-compose --env-file .ports.env %%"
 rebuild = "bonnie dc up --build -d && bonnie dc down" # Use this when you change any Docker configurations or update Rust dependencies
 up = "bonnie dc up -d"
 end = "bonnie dc down"
-sh.cmd = "bonnie dc run --entrypoint \"/bin/zsh\" -p %SERVER_PORT:7000 -p %SUBSCRIPTIONS_SERVER_PORT:6000 --use-aliases --rm playground"
-sh.env_vars = [
-    "SERVER_PORT",
-    "SUBSCRIPTIONS_SERVER_PORT"
-]
+sh = "bonnie dc run --entrypoint \"/bin/zsh\" --use-aliases --rm playground"
 
 # General Rust scripts
 doc = "cargo doc"
 test = "cargo watch -x \"test\""
 dev = "cargo watch -x \"check\""
 check = "cargo check && cargo fmt -- --check && cargo clippy && cargo test" # This will be run on CI as well
+example = { cmd = "cargo watch -x \"run --example %example_name\"", args = ["example_name"] }
 
 # Releases the project to GitHub and publishes the crate itself
 release = "standard-version --sign --commit-all && git push --follow-tags origin main && cargo publish"
