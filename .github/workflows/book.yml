@@ -4,6 +4,7 @@ on:
     push:
         paths:
             - "docs/**"
+            - ".github/workflows/book.yml" # If we change this build script, it should rerun
 
 jobs:
     deploy:
