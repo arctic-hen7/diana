@@ -48,7 +48,7 @@ mod serverless;
 mod subscriptions_server;
 
 // Public exports accessible from the root (everything the user will need)
-pub use crate::auth::jwt::{create_jwt, decode_time_str, validate_and_decode_jwt};
+pub use crate::auth::jwt::{create_jwt, decode_time_str, validate_and_decode_jwt, get_jwt_secret};
 pub use crate::aws_serverless::{run_aws_req, AwsError};
 pub use crate::graphql_server::create_graphql_server;
 pub use crate::options::{AuthCheckBlockState, Options, OptionsBuilder};
@@ -76,3 +76,4 @@ pub use async_graphql::{
 };
 // Other stuff users shouldn't have to install for basic use
 pub use async_stream::stream; // The `stream!` macro
+pub use tokio::stream::{Stream, StreamExt}; // For subscriptions

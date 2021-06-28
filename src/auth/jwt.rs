@@ -17,7 +17,7 @@ pub struct JWTSecret<'a> {
     decoding_key: DecodingKey<'a>,
 }
 
-// A function to get a JWT secret from a given string for both encoding and decoding
+/// Transforms a string JWT secret into a form in which it can be used for operations.
 pub fn get_jwt_secret<'a>(secret_str: String) -> Result<JWTSecret<'a>> {
     let encoding_key = EncodingKey::from_base64_secret(&secret_str)?;
     let decoding_key = DecodingKey::from_base64_secret(&secret_str)?;

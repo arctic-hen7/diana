@@ -34,6 +34,9 @@ chrono = "0.4.19"
 netlify_lambda_http = "0.2.0"
 aws_lambda_events = "0.4.0"
 
+[dev-dependencies]
+dotenv = "0.15.0"
+
 [lib]
 name = "diana"
 path = "src/lib.rs"
