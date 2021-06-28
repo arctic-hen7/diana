@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1](https://github.com/diana-graphql/diana/compare/v0.1.0...v0.1.1) (2021-06-28)
+
+
+### Bug Fixes
+
+* 🔧 fixed incorrect compose target in playground ([84d926e](https://github.com/diana-graphql/diana/commit/84d926ea95756a6f77390d8799e755e5ccde7812))
+* 🔧 updated crate name ([18ac391](https://github.com/diana-graphql/diana/commit/18ac3912d48b31e5b49c4819fb618ea1ab940a16))
+
+
+### Code Refactorings
+
+* 🚚 switched to workspace structure for examples ([ad330f2](https://github.com/diana-graphql/diana/commit/ad330f2abf5d5f14ad99fb5be6c39b316ae725ec))
+
+
+### Documentation Changes
+
+* ✏️ fixed typo in `if_authed` docs ([43c2fe4](https://github.com/diana-graphql/diana/commit/43c2fe4ad52a33ffd29ccde4c0315eb6cb013c8e))
+* 📝 added mdbook basics ([ee475cd](https://github.com/diana-graphql/diana/commit/ee475cd601b7df09917dfba8676b502bc5565e8c))
+* 📝 made trivial docs change to test book deployment ([76260da](https://github.com/diana-graphql/diana/commit/76260da8abc4a606afb55330908ac412d3f4477b))
+* 📝 updated documentation examples ([d3477a2](https://github.com/diana-graphql/diana/commit/d3477a2f21d6c2b8756e77cbd71deac9e21597d6))
+
 ## 0.1.0 (2021-06-27)
 
 
