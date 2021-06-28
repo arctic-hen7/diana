@@ -1,6 +1,6 @@
 // Utility functions for GraphQL resolvers
 use std::sync::{Mutex, MutexGuard};
-use tokio::stream::Stream;
+use tokio_stream::Stream;
 
 use crate::auth::auth_state::AuthState;
 use crate::errors::*;
@@ -77,7 +77,7 @@ macro_rules! if_authed(
 ///     errors::GQLResult,
 ///     GQLSubscription, GQLSimpleObject,
 /// };
-/// use tokio::stream::{Stream, StreamExt};
+/// use tokio_stream::{Stream, StreamExt};
 /// use serde::Deserialize;
 ///
 /// #[derive(Deserialize, GQLSimpleObject)]

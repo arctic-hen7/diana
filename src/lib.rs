@@ -60,8 +60,7 @@ pub use crate::subscriptions_server::create_subscriptions_server;
 pub use actix_web::{App, HttpServer};
 // Users also shouldn't have to install the Netlify stuff themselves for basic usage
 pub use netlify_lambda_http::{
-    handler as create_handler,
-    lambda::{run as run_lambda, Context as LambdaCtx},
+    lambda::{Context as LambdaCtx},
     IntoResponse as IntoLambdaResponse, Request as LambdaRequest,
 };
 // Users shouldn't have to install `async_graphql` themselves for basic usage
@@ -76,4 +75,4 @@ pub use async_graphql::{
 };
 // Other stuff users shouldn't have to install for basic use
 pub use async_stream::stream; // The `stream!` macro
-pub use tokio::stream::{Stream, StreamExt}; // For subscriptions
+pub use tokio_stream::{Stream, StreamExt}; // For subscriptions

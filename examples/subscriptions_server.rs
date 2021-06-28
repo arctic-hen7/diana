@@ -9,7 +9,7 @@ use diana::{create_subscriptions_server, App, HttpServer};
 // It will literally be interpolated here
 // Never use this in production unless you have a fantastic reason! Just import your code through Cargo!
 // We do this here though because you can't import from another example (which is annoying)
-include!("./schema.in");
+include!("./netlify/schema.rs");
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

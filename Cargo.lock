@@ -832,7 +832,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
- "tokio 0.2.25",
+ "tokio 1.7.1",
  "tokio-stream",
 ]
 
@@ -1554,18 +1554,6 @@ dependencies = [
  "log",
  "miow 0.3.7",
  "ntapi",
- "winapi 0.3.9",
-]
-
-[[package]]
-name = "mio-named-pipes"
-version = "0.1.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0840c1c50fd55e521b247f949c241c9997709f23bd7f023b9762cd561e935656"
-dependencies = [
- "log",
- "mio 0.6.23",
- "miow 0.3.7",
  "winapi 0.3.9",
 ]
 
@@ -2536,13 +2524,10 @@ dependencies = [
  "libc",
  "memchr",
  "mio 0.6.23",
- "mio-named-pipes",
  "mio-uds",
- "num_cpus",
  "pin-project-lite 0.1.12",
  "signal-hook-registry",
  "slab",
- "tokio-macros 0.2.6",
  "winapi 0.3.9",
 ]
 
@@ -2562,19 +2547,8 @@ dependencies = [
  "parking_lot",
  "pin-project-lite 0.2.6",
  "signal-hook-registry",
- "tokio-macros 1.2.0",
+ "tokio-macros",
  "winapi 0.3.9",
-]
-
-[[package]]
-name = "tokio-macros"
-version = "0.2.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e44da00bfc73a25f814cd8d7e57a68a5c31b74b3152a0a1d1f590c97ed06265a"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
