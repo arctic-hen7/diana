@@ -4,7 +4,7 @@
 use async_graphql::{ObjectType, SubscriptionType};
 use std::any::Any;
 
-use crate::auth::core::AuthCheckBlockState;
+use crate::auth::core::AuthBlockLevel;
 use crate::errors::*;
 pub use crate::graphql::{SubscriptionsServerInformation, UserSchema};
 
@@ -30,9 +30,9 @@ where
     /// This should be stored in an environment variable and randomly generated (see the book).
     pub jwt_secret: String,
     /// The blocking level that will be used for the GraphQL endpoint.
-    /// See [`AuthCheckBlockState`] for available blocklevels and their meanings.
+    /// See [`AuthBlockLevel`] for available blocklevels and their meanings.
     /// The default here is to block anything that is not authenticated.
-    pub authentication_block_state: AuthCheckBlockState,
+    pub authentication_block_state: AuthBlockLevel,
     /// The endpoint for the GraphiQL playground.
     /// If nothing is provided here, the playground will be disabled.
     /// Not supported in production
@@ -58,7 +58,7 @@ where
     subscriptions_server_jwt_to_connect: Option<String>, // The real property actually does take an Option<String> for this one
     schema: Option<UserSchema<Q, M, S>>,
     jwt_secret: Option<String>,
-    authentication_block_state: Option<AuthCheckBlockState>,
+    authentication_block_state: Option<AuthBlockLevel>,
     playground_endpoint: Option<String>, // The real property actually does take an Option<String> for this one
     graphql_endpoint: Option<String>,
 }
@@ -117,8 +117,8 @@ where
         self.jwt_secret = Some(jwt_secret.to_string());
         self
     }
-    /// Defines the blocklevel for the GraphQL endpoint. See [`AuthCheckBlockState`] for more details.
-    pub fn auth_block_state(mut self, authentication_block_state: AuthCheckBlockState) -> Self {
+    /// Defines the blocklevel for the GraphQL endpoint. See [`AuthBlockLevel`] for more details.
+    pub fn auth_block_state(mut self, authentication_block_state: AuthBlockLevel) -> Self {
         self.authentication_block_state = Some(authentication_block_state);
         self
     }

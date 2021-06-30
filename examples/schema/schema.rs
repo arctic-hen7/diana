@@ -2,7 +2,7 @@
 // All examples import it dirtily by using the `include!` macro, which you should never use unless you have a very good reason to!
 
 use diana::{
-    Options, OptionsBuilder, AuthCheckBlockState,
+    Options, OptionsBuilder, AuthBlockLevel,
     async_graphql::{
         Object as GQLObject, Subscription as GQLSubscription,
         SimpleObject as GQLSimpleObject,
@@ -93,7 +93,7 @@ pub fn get_opts() -> Options<Context, Query, Mutation, Subscription> {
         .jwt_to_connect_to_subscriptions_server(
             &env::var("SUBSCRIPTIONS_SERVER_PUBLISH_JWT").unwrap(),
         )
-        .auth_block_state(AuthCheckBlockState::AllowAll)
+        .auth_block_state(AuthBlockLevel::AllowAll)
         .jwt_secret(&env::var("JWT_SECRET").unwrap())
         .schema(Query {}, Mutation {}, Subscription {})
         // Endpoints are set up as `/graphql` and `/graphiql` automatically

@@ -7,7 +7,7 @@ use crate::errors::*;
 /// An enum for the level of blocking imposed on a particular endpoint.
 /// Your choice on this should be carefully evaluated based on your threat model. Please choose wisely!
 #[derive(Debug, Clone, Copy)]
-pub enum AuthCheckBlockState {
+pub enum AuthBlockLevel {
     /// Allows anything through.
     /// - Valid token   -> allow
     /// - Invalid token -> allow
@@ -74,20 +74,20 @@ pub enum AuthVerdict {
 // Compares the given token's authentication state (as a raw result) to a given block-level to arrive at a verdict
 pub fn get_auth_verdict(
     token_state: Result<AuthState>,
-    block_state: AuthCheckBlockState,
+    block_state: AuthBlockLevel,
 ) -> AuthVerdict {
     match token_state {
         // We hold `token_state` as the AuthState variant so we don't pointlessly insert a Result into the request extensions
         Ok(token_state @ AuthState::Authorised(_)) => AuthVerdict::Allow(token_state),
         Ok(token_state @ AuthState::InvalidToken) => {
-            if let AuthCheckBlockState::AllowAll = block_state {
+            if let AuthBlockLevel::AllowAll = block_state {
                 AuthVerdict::Allow(token_state)
             } else {
                 AuthVerdict::Block
             }
         }
         Ok(token_state @ AuthState::NoToken) => {
-            if let AuthCheckBlockState::AllowAll | AuthCheckBlockState::AllowMissing = block_state {
+            if let AuthBlockLevel::AllowAll | AuthBlockLevel::AllowMissing = block_state {
                 AuthVerdict::Allow(token_state)
             } else {
                 AuthVerdict::Block

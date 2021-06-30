@@ -7,7 +7,7 @@ use async_graphql::{
     http::{playground_source, GraphQLPlaygroundConfig},
     ObjectType, SubscriptionType,
 };
-use diana::{errors::*, AuthCheckBlockState, DianaHandler, Options};
+use diana::{errors::*, AuthBlockLevel, DianaHandler, Options};
 use std::any::Any;
 
 use crate::auth_middleware::AuthCheck;
@@ -28,9 +28,9 @@ where
     // Get the appropriate authentication middleware set up with the JWT secret
     // This will wrap the GraphQL endpoint itself
     let auth_middleware = match opts.authentication_block_state {
-        AuthCheckBlockState::AllowAll => AuthCheck::new(&diana_handler),
-        AuthCheckBlockState::AllowMissing => AuthCheck::new(&diana_handler),
-        AuthCheckBlockState::BlockUnauthenticated => AuthCheck::new(&diana_handler),
+        AuthBlockLevel::AllowAll => AuthCheck::new(&diana_handler),
+        AuthBlockLevel::AllowMissing => AuthCheck::new(&diana_handler),
+        AuthBlockLevel::BlockUnauthenticated => AuthCheck::new(&diana_handler),
     };
 
     let graphql_endpoint = opts.graphql_endpoint;
