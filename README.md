@@ -49,6 +49,12 @@ Because of its structure, Diana needs you to run two servers in development. Whi
 
 All further documentation can be found in [the book](https://diana-graphql.github.io), which was made with [mdBook](https://rust-lang.github.io/mdBook/index.html).
 
+## Versioning
+
+Each Diana integration depends on the core library, so any change of the core library will result in a version change for an integration. That is also applied backwards in that any version change in an integration also results in a version change of the core and all other integrations. Essentially, the whole of Diana will always be at a certain version, the latest tag of this repository.
+
+When a new version is added, it will begin in `v0.1.0`. Once it moves to a stable release, what would otherwise be `v1.0.0`, it is immediately bumped to the same version as the rest of the Diana ecosystem.
+
 ## Credit to `async_graphql`
 
 [`async_graphql`](https://github.com/async-graphql/async-graphql) must be acknowledged as the primary dependency of Diana, as well as the biggest inspiration for the project. It is a fantastic GraphQL library for Rust, and if you want to go beyond the scope of Diana (which is more high-level), this should be your first port of call. Without it, Diana would not be possible at all.
