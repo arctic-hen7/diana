@@ -1,8 +1,2 @@
-# Any env files ending in `.local` contain secret information (NextJS naming convention)
-.*env*.local
-
 target/
 netlify-config.json
-
-# Local Netlify folder
-.netlify
