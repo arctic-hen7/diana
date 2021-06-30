@@ -21,12 +21,10 @@ include = [
 diana = { path = "../../../" }
 serde = "1.0.103"
 serde_json = "1.0.44"
-tokio = { version = "1.0.1", features = ["full"] }
 futures = "0.3.14"
 async-graphql = "2.8.2"
 async-graphql-actix-web = "2.8.2"
 actix-web = "3.3.2"
-error-chain = "0.12.4"
 
 [dev-dependencies]
 dotenv = "0.15.0"

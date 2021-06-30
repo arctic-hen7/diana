@@ -1,6 +1,5 @@
 // This file just defines the common schema and options that everything else will use
-// It is imported legitimately by the Netlify example because it's the only multi-file example at the moment
-// Everything else imports it by using the `include!` macro, which you should never use unless you have a very good reason to!
+// All examples import it dirtily by using the `include!` macro, which you should never use unless you have a very good reason to!
 
 use diana::{
     Options, OptionsBuilder, AuthCheckBlockState,
