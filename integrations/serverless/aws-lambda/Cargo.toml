@@ -1,0 +1,33 @@
+[package]
+name = "diana-aws-lambda"
+description = "The integration between Diana GraphQL and AWS Lambda (including its derivatives, like Netlify)."
+version = "0.1.0"
+authors = ["arctic_hen7 <arctic_hen7@pm.me>"]
+edition = "2018"
+license-file = "LICENSE"
+repository = "https://github.com/arctic-hen7/diana"
+homepage = "https://github.com/arctic-hen7/diana"
+keywords = ["graphql", "serverless", "authentication"]
+categories = ["web-programming", "web-programming::http-server", "web-programming::websocket"]
+include = [
+    "src/*",
+    "Cargo.toml",
+    "LICENSE",
+    "README.md"
+]
+
+[dependencies]
+diana = { path = "../../../" }
+serde = "1.0.103"
+serde_json = "1.0.44"
+tokio = { version = "1.0.1", features = ["full"] }
+async-graphql = "2.8.2"
+netlify_lambda_http = "0.2.0"
+aws_lambda_events = "0.4.0"
+
+[dev-dependencies]
+dotenv = "0.15.0"
+
+[lib]
+name = "diana_aws_lambda"
+path = "src/lib.rs"

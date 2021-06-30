@@ -851,6 +851,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "diana-aws-lambda"
+version = "0.1.0"
+dependencies = [
+ "async-graphql",
+ "aws_lambda_events",
+ "diana",
+ "dotenv",
+ "netlify_lambda_http",
+ "serde",
+ "serde_json",
+ "tokio 1.7.1",
+]
+
+[[package]]
 name = "digest"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

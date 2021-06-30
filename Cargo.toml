@@ -44,6 +44,7 @@ path = "src/lib.rs"
 [workspace]
 members = [
     "integrations/serverful/actix-web",
+    "integrations/serverless/aws-lambda"
 ]
 
 # This is all optimisation for the release binaries, mainly targeted at the serverless example
