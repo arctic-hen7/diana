@@ -17,15 +17,6 @@ you just change one file!
 
 This documentation does not contain examples, which can be found in the [GitHub repository](https://github.com/diana-graphql/diana). More
 detailed explanations and tutorials can be found in the [book](https://diana-graphql.github.io).
-
-# Installation
-
-This crate is [on crates.io](https://crates.io/crates/diana) and can be used by adding `diana` to your dependencies in your project's
-`Cargo.toml` like so:
-
-```toml
-[dependencies]
-diana = "0.2.0"
 ```
 */
 
