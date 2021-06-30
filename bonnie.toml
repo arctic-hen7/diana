@@ -1,7 +1,4 @@
 version = "0.2.0"
-env_files = [
-    ".ports.env"
-]
 
 [scripts]
 # Gets the ID of a running Docker container by its name (utility script)
@@ -11,7 +8,7 @@ getcontainerid.args = [
 ]
 
 # Docker scripts
-dc = "docker-compose --env-file .ports.env %%"
+dc = "docker-compose %%"
 rebuild = "bonnie dc up --build -d && bonnie dc down" # Use this when you change any Docker configurations or update Rust dependencies
 up = "bonnie dc up -d"
 end = "bonnie dc down"
