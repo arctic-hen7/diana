@@ -1,12 +1,13 @@
 [package]
 name = "diana"
 description = "Diana is an out-of-the-box GraphQL system with full support for use as a serverless function, as well as commonly-used features like subscriptions and authentication."
-version = "0.1.1"
+version = "0.2.0"
 authors = ["arctic_hen7 <arctic_hen7@pm.me>"]
 edition = "2018"
 license-file = "LICENSE"
-repository = "https://github.com/arctic-hen7/diana"
-homepage = "https://github.com/arctic-hen7/diana"
+license = "MIT"
+repository = "https://github.com/diana-graphql/diana"
+homepage = "https://diana-graphql.github.io"
 keywords = ["graphql", "serverless", "authentication"]
 categories = ["web-programming", "web-programming::http-server", "web-programming::websocket"]
 include = [
