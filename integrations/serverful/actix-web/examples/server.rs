@@ -3,7 +3,10 @@
 
 #![forbid(unsafe_code)]
 
-use diana_actix_web::{create_graphql_server, actix_web::{App, HttpServer}};
+use diana_actix_web::{
+    actix_web::{App, HttpServer},
+    create_graphql_server,
+};
 
 // This 'dirty-imports' the code in `schema.in`
 // It will literally be interpolated here

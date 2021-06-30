@@ -1,12 +1,11 @@
 #![forbid(unsafe_code)]
 
 use diana_aws_lambda::{
-    run_aws_req,
-    AwsError,
     netlify_lambda_http::{
-        lambda::Context as LambdaCtx, IntoResponse as IntoLambdaResponse, Request as LambdaRequest,
-        lambda
-    }
+        lambda, lambda::Context as LambdaCtx, IntoResponse as IntoLambdaResponse,
+        Request as LambdaRequest,
+    },
+    run_aws_req, AwsError,
 };
 
 // This 'dirty-imports' the code in `schema.in`
