@@ -25,4 +25,7 @@ serverless-deploy = "bonnie serverless compile && netlify deploy --prod"
 
 # Releases the project to GitHub (doesn't publish the crates)
 release = "standard-version --sign --commit-all && git push --follow-tags origin main"
-publish = "cargo publish && cd integrations/serverful/actix-web && cargo publish && cd ../../serverless/aws-lambda && cargo publish"
+publish = "bonnie publish-core && bonnie publish-actix-web && bonnie publish-aws-lambda"
+publish-core = "cargo publish"
+publish-actix-web = "cd integrations/serverful/actix-web && cargo publish"
+publish-aws-lambda = "cd integrations/serverless/aws-lambda && cargo publish"
