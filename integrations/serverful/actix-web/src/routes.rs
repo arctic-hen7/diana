@@ -3,7 +3,7 @@ use async_graphql::{ObjectType, SubscriptionType};
 use async_graphql_actix_web::WSSubscription; // Pre-built WebSocket logic
 use std::any::Any;
 
-use diana::{DianaHandler, DianaResponse, AuthVerdict};
+use diana::{AuthVerdict, DianaHandler, DianaResponse};
 
 // TODO reduce code duplication here
 
@@ -12,7 +12,7 @@ use diana::{DianaHandler, DianaResponse, AuthVerdict};
 pub async fn graphql_without_subscriptions<C, Q, M, S>(
     diana_handler: web::Data<DianaHandler<C, Q, M, S>>,
     http_req: HttpRequest,
-    body: String
+    body: String,
 ) -> HttpResponse
 where
     C: Any + Send + Sync + Clone,
@@ -25,13 +25,15 @@ where
     let auth_verdict = extensions.get::<AuthVerdict>().cloned();
 
     // Run the query, stating that authentication checks don't need to be performed again
-    let res = diana_handler.run_stateless_without_subscriptions(body, None, auth_verdict).await;
+    let res = diana_handler
+        .run_stateless_without_subscriptions(body, None, auth_verdict)
+        .await;
 
     // Transform the DianaResponse into an HttpResponse
     match res {
         DianaResponse::Success(res) => res.into(),
         DianaResponse::Blocked => HttpResponse::Forbidden().finish(),
-        DianaResponse::Error(_) => HttpResponse::InternalServerError().finish()
+        DianaResponse::Error(_) => HttpResponse::InternalServerError().finish(),
     }
 }
 // The main GraphQL endpoint for queries and mutations with authentication support
@@ -39,7 +41,7 @@ where
 pub async fn graphql_for_subscriptions<C, Q, M, S>(
     diana_handler: web::Data<DianaHandler<C, Q, M, S>>,
     http_req: HttpRequest,
-    body: String
+    body: String,
 ) -> HttpResponse
 where
     C: Any + Send + Sync + Clone,
@@ -52,13 +54,15 @@ where
     let auth_verdict = extensions.get::<AuthVerdict>().cloned();
 
     // Run the query, stating that authentication checks don't need to be performed again
-    let res = diana_handler.run_stateless_for_subscriptions(body, None, auth_verdict).await;
+    let res = diana_handler
+        .run_stateless_for_subscriptions(body, None, auth_verdict)
+        .await;
 
     // Transform the DianaResponse into an HttpResponse
     match res {
         DianaResponse::Success(res) => res.into(),
         DianaResponse::Blocked => HttpResponse::Forbidden().finish(),
-        DianaResponse::Error(_) => HttpResponse::InternalServerError().finish()
+        DianaResponse::Error(_) => HttpResponse::InternalServerError().finish(),
     }
 }
 

@@ -3,11 +3,11 @@ use actix_web::{
     Error, HttpMessage, HttpResponse,
 };
 use async_graphql::{ObjectType, SubscriptionType};
+use diana::{AuthVerdict, DianaHandler};
 use futures::{
     future::{ok, Ready},
     Future,
 };
-use diana::{DianaHandler, AuthVerdict};
 use std::any::Any;
 use std::pin::Pin;
 use std::result::Result as StdResult;
@@ -34,7 +34,7 @@ where
     // Initialises a new instance of the authentication middleware factory by cloning the given DianaHandler
     pub fn new(diana_handler: &DianaHandler<C, Q, M, S>) -> Self {
         Self {
-            diana_handler: diana_handler.clone()
+            diana_handler: diana_handler.clone(),
         }
     }
 }
@@ -104,18 +104,22 @@ where
 
     fn call(&mut self, req: ServiceRequest) -> Self::Future {
         // Get the HTTP `Authorization` header
-        let auth_header = req.headers().get("AUTHORIZATION").map(|auth_header| {
-            // We convert to a string and handle the result, which gives us an Option inside an Option
-            let header_str = auth_header.to_str();
-            match header_str {
-                Ok(header_str) => Some(header_str),
-                Err(_) => None
-            }
-        }).flatten(); // Then we flatten the two Options into one Option
-        // Get a verdict and match that to a middleware outcome
+        let auth_header = req
+            .headers()
+            .get("AUTHORIZATION")
+            .map(|auth_header| {
+                // We convert to a string and handle the result, which gives us an Option inside an Option
+                let header_str = auth_header.to_str();
+                match header_str {
+                    Ok(header_str) => Some(header_str),
+                    Err(_) => None,
+                }
+            })
+            .flatten(); // Then we flatten the two Options into one Option
+                        // Get a verdict and match that to a middleware outcome
         let verdict = self.diana_handler.is_authed(auth_header);
         match verdict {
-            auth_verdict @ AuthVerdict::Allow(_)  => {
+            auth_verdict @ AuthVerdict::Allow(_) => {
                 // Insert the authentication verdict into the request extensions for later retrieval
                 req.extensions_mut().insert(auth_verdict);
                 // Move on from this middleware to the handler

@@ -5,7 +5,7 @@ use aws_lambda_events::encodings::Body;
 use netlify_lambda_http::{Request, Response};
 use std::any::Any;
 
-use diana::{Options, DianaHandler, DianaResponse};
+use diana::{DianaHandler, DianaResponse, Options};
 
 /// A *very* generic error type that the lambda will accept as a return type.
 pub type AwsError = Box<dyn std::error::Error + Send + Sync + 'static>;
@@ -162,7 +162,9 @@ where
     // Run the serverless request with the extracted data and the user's given options
     // We convert the Option<String> to Option<&str> with `.as_deref()`
     // We explicitly state that authentication checks need to be run again
-    let res = diana_handler.run_stateless_without_subscriptions(body, auth_header.as_deref(), None).await;
+    let res = diana_handler
+        .run_stateless_without_subscriptions(body, auth_header.as_deref(), None)
+        .await;
 
     // Convert the result to an appropriate HTTP response
     let http_res = parse_aws_res(res)?;

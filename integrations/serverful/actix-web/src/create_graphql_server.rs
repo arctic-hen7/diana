@@ -1,7 +1,3 @@
-use diana::{
-    DianaHandler, Options, AuthCheckBlockState,
-    errors::*
-};
 use actix_web::{
     guard,
     web::{self, ServiceConfig},
@@ -11,6 +7,7 @@ use async_graphql::{
     http::{playground_source, GraphQLPlaygroundConfig},
     ObjectType, SubscriptionType,
 };
+use diana::{errors::*, AuthCheckBlockState, DianaHandler, Options};
 use std::any::Any;
 
 use crate::auth_middleware::AuthCheck;
@@ -33,9 +30,7 @@ where
     let auth_middleware = match opts.authentication_block_state {
         AuthCheckBlockState::AllowAll => AuthCheck::new(&diana_handler),
         AuthCheckBlockState::AllowMissing => AuthCheck::new(&diana_handler),
-        AuthCheckBlockState::BlockUnauthenticated => {
-            AuthCheck::new(&diana_handler)
-        }
+        AuthCheckBlockState::BlockUnauthenticated => AuthCheck::new(&diana_handler),
     };
 
     let graphql_endpoint = opts.graphql_endpoint;

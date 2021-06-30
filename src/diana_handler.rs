@@ -1,13 +1,16 @@
 // This file contains the core logic primitives that actually run a given request
 // This is depended on by serverful and serverless systems
 
-use async_graphql::{ObjectType, Request, SubscriptionType, EmptySubscription, Schema};
+use async_graphql::{EmptySubscription, ObjectType, Request, Schema, SubscriptionType};
 use std::any::Any;
 
 use crate::auth::core::{get_auth_verdict, get_token_state_from_header, AuthVerdict};
-use crate::graphql::{get_schema_without_subscriptions, get_schema_for_subscriptions, PublishMutation, SubscriptionQuery};
-use crate::options::Options;
 use crate::errors::*;
+use crate::graphql::{
+    get_schema_for_subscriptions, get_schema_without_subscriptions, PublishMutation,
+    SubscriptionQuery,
+};
+use crate::options::Options;
 
 /// The basic response from a given request.
 #[derive(Debug)]
@@ -27,7 +30,7 @@ pub enum DianaResponse {
 // Represents the chice of the schema for/without subscriptions
 enum SysSchema {
     WithoutSubscriptions,
-    ForSubscriptions
+    ForSubscriptions,
 }
 
 /// The core logic primitive that underlies Diana's systems. You should only use this if you need to support a platform other than the ones
@@ -61,15 +64,18 @@ where
     pub fn new(opts: Options<C, Q, M, S>) -> Result<Self> {
         // Get the schema (this also creates a publisher to the subscriptions server and inserts context)
         // We deal with any errors directly with the serverless response enum
-        let schema_without_subscriptions =
-            get_schema_without_subscriptions(opts.schema.clone(), opts.subscriptions_server_data.clone(), opts.ctx.clone())?;
+        let schema_without_subscriptions = get_schema_without_subscriptions(
+            opts.schema.clone(),
+            opts.subscriptions_server_data.clone(),
+            opts.ctx.clone(),
+        )?;
         let schema_for_subscriptions =
             get_schema_for_subscriptions(opts.schema.clone(), opts.ctx.clone());
 
         Ok(Self {
             opts,
             schema_without_subscriptions,
-            schema_for_subscriptions
+            schema_for_subscriptions,
         })
     }
     /// Determines ahead of time whether or not a request is authenticated. This should be used in middleware if possible so we can avoid
@@ -77,7 +83,8 @@ where
     /// This just takes the HTTP `Authorization` header and returns an [`AuthVerdict`].
     pub fn is_authed(&self, raw_auth_header: Option<&str>) -> AuthVerdict {
         // Get a verdict on whether or not the user should be allowed through
-        let token_state = get_token_state_from_header(raw_auth_header, self.opts.jwt_secret.clone());
+        let token_state =
+            get_token_state_from_header(raw_auth_header, self.opts.jwt_secret.clone());
         get_auth_verdict(token_state, self.opts.authentication_block_state)
     }
     /// Runs a query or mutation (stateless) given the request body and the value of the HTTP `Authorization` header.
@@ -85,23 +92,51 @@ where
     /// this can be provided as the third argument to avoid running auth checks twice.
     /// This will return a [`DianaResponse`] no matter what, which simplifies error handling significantly.
     /// This function is for the subscriptions system only.
-    pub async fn run_stateless_for_subscriptions(&self, body: String, raw_auth_header: Option<&str>, given_auth_verdict: Option<AuthVerdict>) -> DianaResponse {
-        self.run_stateless_req(SysSchema::ForSubscriptions, body, raw_auth_header, given_auth_verdict).await
+    pub async fn run_stateless_for_subscriptions(
+        &self,
+        body: String,
+        raw_auth_header: Option<&str>,
+        given_auth_verdict: Option<AuthVerdict>,
+    ) -> DianaResponse {
+        self.run_stateless_req(
+            SysSchema::ForSubscriptions,
+            body,
+            raw_auth_header,
+            given_auth_verdict,
+        )
+        .await
     }
     /// Runs a query or mutation (stateless) given the request body and the value of the HTTP `Authorization` header.
     /// This performs authorisation checks and runs the actual request. If you've already used `.is_authed()` to obtain an [`AuthVerdict`],
     /// this can be provided as the third argument to avoid running auth checks twice.
     /// This will return a [`DianaResponse`] no matter what, which simplifies error handling significantly.
     /// This function is for the queries/mutations system only.
-    pub async fn run_stateless_without_subscriptions(&self, body: String, raw_auth_header: Option<&str>, given_auth_verdict: Option<AuthVerdict>) -> DianaResponse {
-        self.run_stateless_req(SysSchema::WithoutSubscriptions, body, raw_auth_header, given_auth_verdict).await
+    pub async fn run_stateless_without_subscriptions(
+        &self,
+        body: String,
+        raw_auth_header: Option<&str>,
+        given_auth_verdict: Option<AuthVerdict>,
+    ) -> DianaResponse {
+        self.run_stateless_req(
+            SysSchema::WithoutSubscriptions,
+            body,
+            raw_auth_header,
+            given_auth_verdict,
+        )
+        .await
     }
     /// This is used internally to provide query/mutation running functionality to the systems for/without subscriptions
-    async fn run_stateless_req(&self, which_schema: SysSchema, body: String, raw_auth_header: Option<&str>, given_auth_verdict: Option<AuthVerdict>) -> DianaResponse {
+    async fn run_stateless_req(
+        &self,
+        which_schema: SysSchema,
+        body: String,
+        raw_auth_header: Option<&str>,
+        given_auth_verdict: Option<AuthVerdict>,
+    ) -> DianaResponse {
         // Run authentication checks if we need to (they may have already been run in middleware)
         let verdict = match given_auth_verdict {
             Some(verdict) => verdict,
-            None => self.is_authed(raw_auth_header)
+            None => self.is_authed(raw_auth_header),
         };
 
         // Based on that verdict, maybe run the request
@@ -117,8 +152,12 @@ where
                 gql_req = gql_req.data(auth_data);
                 // Run the request with the correct schema
                 let res = match which_schema {
-                    SysSchema::WithoutSubscriptions => self.schema_without_subscriptions.execute(gql_req).await,
-                    SysSchema::ForSubscriptions => self.schema_for_subscriptions.execute(gql_req).await
+                    SysSchema::WithoutSubscriptions => {
+                        self.schema_without_subscriptions.execute(gql_req).await
+                    }
+                    SysSchema::ForSubscriptions => {
+                        self.schema_for_subscriptions.execute(gql_req).await
+                    }
                 };
                 // Serialise that response into a string (the response bodies all have to be of the same type)
                 let res_str = serde_json::to_string(&res);

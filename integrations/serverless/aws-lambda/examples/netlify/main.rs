@@ -1,10 +1,7 @@
 #![forbid(unsafe_code)]
 
-use diana_aws_lambda::{
-    run_aws_req, AwsError, IntoLambdaResponse,
-    LambdaCtx, LambdaRequest,
-};
-use netlify_lambda_http::{lambda};
+use diana_aws_lambda::{run_aws_req, AwsError, IntoLambdaResponse, LambdaCtx, LambdaRequest};
+use netlify_lambda_http::lambda;
 
 // This 'dirty-imports' the code in `schema.in`
 // It will literally be interpolated here

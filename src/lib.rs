@@ -33,6 +33,7 @@ diana = "0.1.0"
 // This crate has a library architecture for easier testing and code reuse, with binaries that make use of the library in the server crates
 
 mod auth;
+mod diana_handler;
 /// The module for errors and results. This uses [error_chain] behind the scenes.
 /// You'll also find [`GQLResult`](crate::errors::GQLResult) and [`GQLError`](crate::errors::Error) in here, which may be useful in working with your own resolvers.
 pub mod errors;
@@ -41,11 +42,10 @@ mod graphql;
 pub mod graphql_utils; // Users need to be able to access these of course in their schemas
 mod options;
 mod pubsub;
-mod diana_handler;
 
 // Public exports accessible from the root (everything the user will need)
 pub use crate::auth::core::AuthVerdict;
-pub use crate::auth::jwt::{create_jwt, decode_time_str, validate_and_decode_jwt, get_jwt_secret};
+pub use crate::auth::jwt::{create_jwt, decode_time_str, get_jwt_secret, validate_and_decode_jwt};
 pub use crate::diana_handler::{DianaHandler, DianaResponse};
 pub use crate::options::{AuthCheckBlockState, Options, OptionsBuilder};
 pub use crate::pubsub::Publisher;

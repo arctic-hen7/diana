@@ -136,8 +136,11 @@ impl Publisher {
 
         // Get the body out (data still stringified though, that's handled by resolvers)
         let body: GQLPublishResponse = serde_json::from_str(
-            &res.text().await.map_err(|_| ErrorKind::SubscriptionDataPublishFailed)?
-        ).map_err(|_| ErrorKind::SubscriptionDataPublishFailed)?;
+            &res.text()
+                .await
+                .map_err(|_| ErrorKind::SubscriptionDataPublishFailed)?,
+        )
+        .map_err(|_| ErrorKind::SubscriptionDataPublishFailed)?;
 
         // Confirm nothing's gone wrong on a GraphQL level (basically only if we got `false` instead of `true`)
         match body.data.publish {
