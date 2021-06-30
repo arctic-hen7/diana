@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/diana-graphql/diana/compare/v0.1.1...v0.2.0) (2021-06-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* renamed `AuthCheckBlockState` to `AuthBlockLevel`
+* modules now fully re-exported rather than electively
+* original serverless interface no longer supported
+* radical changes with new integrations model (see the book)
+
+### Features
+
+* ✨ added integration for aws lambda and derivatives ([6b6ef32](https://github.com/diana-graphql/diana/commit/6b6ef324d2423617b78163846e9f7b16cb640e01))
+* ✨ switched to integrations model with core logic ([40721eb](https://github.com/diana-graphql/diana/commit/40721eb2938d9b887437a28f9498981266d97ba5))
+
+
+### Code Refactorings
+
+* 🚚 refactored re-exports ([5ede923](https://github.com/diana-graphql/diana/commit/5ede9236d80b362da28bfade7e7ce4121b23bd0a))
+* 🚚 renamed `AuthCheckBlockState` to `AuthBlockLevel` ([d34bfdd](https://github.com/diana-graphql/diana/commit/d34bfdd0af5d7566c0677827aba678db7b6e749c))
+
+
+### Documentation Changes
+
+* 📝 added documentation for integration crates ([99608c6](https://github.com/diana-graphql/diana/commit/99608c6a9e3fe0347617dbd13d0815ab5ac2e3d5))
+* 📝 removed useless section of core crate docs ([6aedfac](https://github.com/diana-graphql/diana/commit/6aedfacd0334b792d6e2629d37414505aa32c91a))
+* 📝 updated docs ([0e734a8](https://github.com/diana-graphql/diana/commit/0e734a852a127feb1542cd84cf66e3efa23cebaa))
+* 📝 updated readme ([fef8ba6](https://github.com/diana-graphql/diana/commit/fef8ba638805286b90ada9dd740025ced83cf890))
+
 ### [0.1.1](https://github.com/diana-graphql/diana/compare/v0.1.0...v0.1.1) (2021-06-28)
 
 
