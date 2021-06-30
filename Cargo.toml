@@ -4,7 +4,6 @@ description = "Diana is an out-of-the-box GraphQL system with full support for u
 version = "0.2.0"
 authors = ["arctic_hen7 <arctic_hen7@pm.me>"]
 edition = "2018"
-license-file = "LICENSE"
 license = "MIT"
 repository = "https://github.com/diana-graphql/diana"
 homepage = "https://diana-graphql.github.io"

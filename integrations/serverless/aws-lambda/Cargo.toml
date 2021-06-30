@@ -4,7 +4,6 @@ description = "The integration between Diana GraphQL and AWS Lambda (including i
 version = "0.1.0"
 authors = ["arctic_hen7 <arctic_hen7@pm.me>"]
 edition = "2018"
-license-file = "LICENSE"
 license = "MIT"
 repository = "https://github.com/diana-graphql/diana"
 homepage = "https://diana-graphql.github.io"
