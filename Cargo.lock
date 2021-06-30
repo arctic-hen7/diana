@@ -815,7 +815,7 @@ dependencies = [
 
 [[package]]
 name = "diana"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "async-graphql",
  "async-stream",
@@ -833,7 +833,7 @@ dependencies = [
 
 [[package]]
 name = "diana-actix-web"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "actix-web",
  "async-graphql",
@@ -847,7 +847,7 @@ dependencies = [
 
 [[package]]
 name = "diana-aws-lambda"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "async-graphql",
  "aws_lambda_events",

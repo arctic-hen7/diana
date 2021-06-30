@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/diana-graphql/diana/compare/v0.2.0...v0.2.1) (2021-06-30)
+
+
+### Bug Fixes
+
+* 🔧 fixed bonnie publish script ([a522249](https://github.com/diana-graphql/diana/commit/a522249576f0f29e476b27c1cec537301178d9df))
+* **cargo:** 🔧 added diana versions to integration crates ([1373667](https://github.com/diana-graphql/diana/commit/1373667d6855bbcdc86961e7766002cb2545432c))
+
+
+### Code Refactorings
+
+* 🔧 split up a few bonnie scripts ([3056b89](https://github.com/diana-graphql/diana/commit/3056b89e08a9b1b83b5bd475bcd9a3783bad9172))
+
+
+### Documentation Changes
+
+* 📝 added readmes for integration crates ([cfdabda](https://github.com/diana-graphql/diana/commit/cfdabda4edbd0fe5e359130643fb07bbf73beb56))
+* 📝 added versioning docs ([e265015](https://github.com/diana-graphql/diana/commit/e265015a7f7d7798daf16b3afc5e414ce26384fd))
+
 ## [0.2.0](https://github.com/diana-graphql/diana/compare/v0.1.1...v0.2.0) (2021-06-30)
 
 
