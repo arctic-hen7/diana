@@ -18,10 +18,11 @@ sh = "bonnie dc run --entrypoint \"/bin/zsh\" --use-aliases --rm playground"
 doc = "cargo doc"
 test = "cargo watch -x \"test\""
 dev = "cargo watch -x \"check\""
-check = "cargo check && cargo fmt -- --check && cargo clippy && cargo test" # This will be run on CI as well
+check = "cargo check --all && cargo fmt --all -- --check && cargo clippy --all && cargo test --all" # This will be run on CI as well
 example = { cmd = "cargo watch -x \"run --example %example_name\"", args = ["example_name"] }
 serverless-compile = "cd examples/netlify && sh build.sh"
 serverless-deploy = "bonnie serverless compile && netlify deploy --prod"
 
-# Releases the project to GitHub and publishes the crate itself
-release = "standard-version --sign --commit-all && git push --follow-tags origin main && cargo publish"
+# Releases the project to GitHub (doesn't publish the crates)
+release = "standard-version --sign --commit-all && git push --follow-tags origin main"
+publish = "cargo publish && cd integrations/serverful/actix-web && cargo publish && cd ../../serverless/aws-lambda cargo publish"
