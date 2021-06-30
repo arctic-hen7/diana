@@ -61,7 +61,7 @@ impl Publisher {
     /// # Example
     /// ```
     /// use diana::{
-    ///     GQLObject, GQLInputObject, GQLSimpleObject,
+    ///     async_graphql::{Object as GQLObject, InputObject as GQLInputObject, SimpleObject as GQLSimpleObject},
     ///     errors::GQLResult,
     ///     Publisher,
     /// };

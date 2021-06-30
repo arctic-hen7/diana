@@ -28,18 +28,6 @@ pub fn get_jwt_secret<'a>(secret_str: String) -> Result<JWTSecret<'a>> {
     })
 }
 
-/**
- * Decodes time strings like '1w' into actual times from the present moment.
- * Accepts strings of the form 'xXyYzZ...', where the lower-case letters are numbers meaning a number of the intervals X/Y/Z.
- * The available intervals are:
- *      s: second,
- *      m: minute,
- *      h: hour,
- *      d: day,
- *      w: week,
- *      M: month (30 days used here, 12M =/= 1y!),
- *      y: year (365 days always, leap years ignored, if you want them add them as days)
- */
 /// Decodes time strings like '1w' into actual datetimes from the present moment. If you've ever used Node's `jsonwebtoken` module, this is
 /// very similar (based on Vercel's `ms` module for JavaScript).
 /// Accepts strings of the form 'xXyYzZ...', where the lower-case letters are numbers meaning a number of the intervals X/Y/Z (e.g. 1m4d -- one month four days).

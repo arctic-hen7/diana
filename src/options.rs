@@ -4,7 +4,7 @@
 use async_graphql::{ObjectType, SubscriptionType};
 use std::any::Any;
 
-pub use crate::auth::core::AuthCheckBlockState; // Users should be able to easily access this
+use crate::auth::core::AuthCheckBlockState;
 use crate::errors::*;
 pub use crate::graphql::{SubscriptionsServerInformation, UserSchema};
 

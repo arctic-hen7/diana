@@ -51,15 +51,8 @@ pub use crate::options::{AuthCheckBlockState, Options, OptionsBuilder};
 pub use crate::pubsub::Publisher;
 
 // Users shouldn't have to install `async_graphql` themselves for basic usage
-pub use async_graphql::{
-    Context as GQLContext,
-    EmptyMutation,
-    EmptySubscription, // In case the user doesn't have either or both
-    InputObject as GQLInputObject,
-    Object as GQLObject,
-    SimpleObject as GQLSimpleObject,
-    Subscription as GQLSubscription,
-};
+#[doc(no_inline)]
+pub use async_graphql;
 // Other stuff users shouldn't have to install for basic use
 pub use async_stream::stream; // The `stream!` macro
 pub use tokio_stream::{Stream, StreamExt}; // For subscriptions

@@ -3,8 +3,10 @@
 
 use diana::{
     Options, OptionsBuilder, AuthCheckBlockState,
-    GQLObject, GQLSubscription,
-    GQLSimpleObject,
+    async_graphql::{
+        Object as GQLObject, Subscription as GQLSubscription,
+        SimpleObject as GQLSimpleObject,
+    },
     errors::GQLResult,
     Stream, stream,
     graphql_utils::get_stream_for_channel_from_ctx,

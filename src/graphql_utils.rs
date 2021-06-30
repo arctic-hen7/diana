@@ -15,7 +15,7 @@ use crate::pubsub::PubSub;
 /// use diana::{
 ///     errors::{Result, GQLResult},
 ///     graphql_utils::get_auth_data_from_ctx,
-///     GQLObject,
+///     async_graphql::{Object as GQLObject},
 ///     if_authed,
 /// };
 ///
@@ -74,7 +74,7 @@ macro_rules! if_authed(
 ///     stream,
 ///     graphql_utils::get_stream_for_channel_from_ctx,
 ///     errors::GQLResult,
-///     GQLSubscription, GQLSimpleObject,
+///     async_graphql::{Subscription as GQLSubscription, SimpleObject as GQLSimpleObject},
 /// };
 /// use tokio_stream::{Stream, StreamExt};
 /// use serde::Deserialize;

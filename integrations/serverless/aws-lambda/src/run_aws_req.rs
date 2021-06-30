@@ -78,66 +78,7 @@ fn parse_aws_res(res: DianaResponse) -> Result<Response<String>, AwsError> {
 
 /// Runs a request for AWS Lambda or its derivatives (e.g. Netlify).
 /// This just takes the entire Lambda request and does all the processing for you, but it's really just a wrapper around [run_serverless_req].
-/// You should use this function in your Lambda handler.
-/// # Example
-/// ```no_run
-/// use diana::{
-///     create_handler, run_aws_req, run_lambda, AuthCheckBlockState, AwsError, IntoLambdaResponse,
-///     LambdaCtx, LambdaRequest, OptionsBuilder,
-///     GQLObject, EmptySubscription,
-///     errors::GQLResult,
-/// };
-///
-/// #[derive(Default, Clone)]
-/// pub struct Query {}
-/// #[GQLObject]
-/// impl Query {
-///     async fn api_version(&self) -> &str {
-///         "0.1.0"
-///     }
-/// }
-///
-/// #[derive(Default, Clone)]
-/// pub struct Mutation {}
-/// #[GQLObject]
-/// impl Mutation {
-///     async fn update_blah(&self) -> GQLResult<bool> {
-///         // Your code here
-///         Ok(true)
-///     }
-/// }
-///
-/// #[derive(Clone)]
-/// struct Context {
-///     pub pool: Vec<String> // This might be an actual database pool
-/// }
-///
-/// #[tokio::main]
-/// async fn main() -> Result<(), AwsError> {
-///     run_lambda(create_handler(graphql)).await?;
-///     Ok(())
-/// }
-///
-/// async fn graphql(req: LambdaRequest, _: LambdaCtx) -> Result<impl IntoLambdaResponse, AwsError> {
-///     let opts = OptionsBuilder::new()
-///         .ctx(Context {
-///             pool: vec!["connection 1".to_string(), "connection 2".to_string()],
-///         })
-///         .subscriptions_server_hostname("http://subscriptions-server")
-///         .subscriptions_server_port("6000")
-///         .subscriptions_server_endpoint("/graphql")
-///         .jwt_to_connect_to_subscriptions_server("blah")
-///         .auth_block_state(AuthCheckBlockState::AllowAll)
-///         .jwt_secret("blah")
-///         .schema(Query {}, Mutation {}, EmptySubscription {})
-///         // Endpoints are set up as `/graphql` and `/graphiql` automatically
-///         .finish()
-///         .expect("Options building failed!");
-///
-///     let res = run_aws_req(req, opts).await?;
-///     Ok(res)
-/// }
-/// ```
+/// You should use this function in your Lambda handler as shown in the book.
 pub async fn run_aws_req<C, Q, M, S>(
     req: Request,
     opts: Options<C, Q, M, S>,
