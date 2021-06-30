@@ -10,7 +10,7 @@ pub use crate::graphql::{SubscriptionsServerInformation, UserSchema};
 
 /// The options for creating the normal server, subscriptions server, and serverless function.
 /// You should define your options in one file and then import them everywhere you need them.
-/// You should use [OptionsBuilder] to construct this.
+/// You should use [`OptionsBuilder`] to construct this.
 #[derive(Clone)]
 pub struct Options<C, Q, M, S>
 where
@@ -30,7 +30,7 @@ where
     /// This should be stored in an environment variable and randomly generated (see the book).
     pub jwt_secret: String,
     /// The blocking level that will be used for the GraphQL endpoint.
-    /// See [AuthCheckBlockState] for available blocklevels and their meanings.
+    /// See [`AuthCheckBlockState`] for available blocklevels and their meanings.
     /// The default here is to block anything that is not authenticated.
     pub authentication_block_state: AuthCheckBlockState,
     /// The endpoint for the GraphiQL playground.
@@ -41,7 +41,7 @@ where
     pub graphql_endpoint: String,
 }
 
-/// A builder-style struct to create an instance of [Options] idiomatically.
+/// A builder-style struct to create an instance of [`Options`] idiomatically.
 #[derive(Clone)]
 pub struct OptionsBuilder<C, Q, M, S>
 where
@@ -111,13 +111,13 @@ where
         self.ctx = Some(ctx);
         self
     }
-    /// Defines the JWt secret that will be used to authenticate client tokens and communication with the subscriptions server.
+    /// Defines the JWT secret that will be used to authenticate client tokens and communication with the subscriptions server.
     /// This should be randomly generated (see the book).
     pub fn jwt_secret(mut self, jwt_secret: &str) -> Self {
         self.jwt_secret = Some(jwt_secret.to_string());
         self
     }
-    /// Defines the blocklevel for the GraphQL endpoint. See [AuthCheckBlockState] for more details.
+    /// Defines the blocklevel for the GraphQL endpoint. See [`AuthCheckBlockState`] for more details.
     pub fn auth_block_state(mut self, authentication_block_state: AuthCheckBlockState) -> Self {
         self.authentication_block_state = Some(authentication_block_state);
         self

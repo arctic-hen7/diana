@@ -132,6 +132,7 @@ pub fn get_auth_data_from_ctx<'a>(
     Ok(auth_state)
 }
 /// Gets the internal PubSub from the context of a GraphQL resolver. You should never need to use this.
+#[doc(hidden)]
 pub fn get_pubsub_from_ctx<'a>(
     raw_ctx: &'a async_graphql::Context<'_>,
 ) -> Result<MutexGuard<'a, PubSub>> {

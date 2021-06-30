@@ -67,12 +67,13 @@ error_chain! {
             display("you tried to create a subscriptions server without configuring it in the options")
         }
 
-        /// There was an attempt to initialize the GraphiQL playground in a production environment
+        /// There was an attempt to initialize the GraphiQL playground in a production environment.
         AttemptedPlaygroundInProduction {
             description("you tried to initialize the GraphQL playground in production, which is not supported due to authentication issues")
             display("you tried to initialize the GraphQL playground in production, which is not supported due to authentication issues")
         }
 
+        /// There was an error in one of the integrations.
         IntegrationError(message: String, integration_name: String) {
             description("an error occurred in one of Diana's integration libraries")
             display(
@@ -92,7 +93,7 @@ error_chain! {
     }
 }
 
-/// A wrapper around [async_graphql::Result<T>](async_graphql::Result).
+/// A wrapper around [`async_graphql::Result<T>`](async_graphql::Result).
 /// You should use this as the return type for any of your own schemas that might return errors.
 /// # Example
 /// ```rust
@@ -104,7 +105,7 @@ error_chain! {
 /// }
 /// ```
 pub type GQLResult<T> = async_graphql::Result<T>;
-/// A wrapper around [async_graphql::Error].
+/// A wrapper around [`async_graphql::Error`].
 /// If any of your schemas need to explicitly create an error that only exists in them (and you're not using something like [mod@error_chain]),
 /// you should use this.
 /// # Example
