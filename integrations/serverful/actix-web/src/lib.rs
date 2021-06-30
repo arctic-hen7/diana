@@ -1,3 +1,12 @@
+#![forbid(unsafe_code)]
+#![deny(missing_docs)]
+
+/*!
+This is [Diana's](https://diana-graphql.github.io) integration crate for Actix Web, which enables the easy deployment of a Diana system
+on that platform. For more information, see [the documentation for Diana](https://github.com/diana-graphql/diana) and
+[the book](https://diana-graphql.github.io).
+*/
+
 mod auth_middleware;
 mod create_graphql_server;
 mod create_subscriptions_server;
@@ -7,4 +16,5 @@ pub use crate::create_graphql_server::create_graphql_server;
 pub use crate::create_subscriptions_server::create_subscriptions_server;
 
 // Users shouldn't have to install Actix Web themselves for basic usage
-pub use actix_web::{App, HttpServer};
+#[doc(no_inline)]
+pub use actix_web;

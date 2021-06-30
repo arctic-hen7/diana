@@ -13,6 +13,10 @@ use std::any::Any;
 use crate::auth_middleware::AuthCheck;
 use crate::routes::graphql_without_subscriptions;
 
+/// Creates a new server for queries and mutations. This returns a closure that can be used with Actix Web's `.configure()` function to
+/// quickly configure a new or existing Actix Web server to use Diana. For examples, see the book.
+/// This function is designed for development only, Diana should be used serverlessly for queries and mutations in a production environment.
+/// See the book for more information on how to do that.
 pub fn create_graphql_server<C, Q, M, S>(
     opts: Options<C, Q, M, S>,
 ) -> Result<impl FnOnce(&mut ServiceConfig) + Clone>

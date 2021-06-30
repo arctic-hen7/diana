@@ -13,6 +13,10 @@ use std::any::Any;
 use crate::auth_middleware::AuthCheck;
 use crate::routes::{graphql_for_subscriptions, graphql_ws};
 
+/// Creates a new subscriptions server. This returns a closure that can be used with Actix Web's `.configure()` function to quickly configure
+/// a new or existing Actix Web server to use Diana. For examples, see the book. This function should be used to create production servers.
+/// If your setup doesn't require subscriptions at all, don't configure anything in the [`Options`](diana::Options) and don't worry
+/// about this function, subscriptions will automatically be disabled.
 pub fn create_subscriptions_server<C, Q, M, S>(
     opts: Options<C, Q, M, S>,
 ) -> Result<impl FnOnce(&mut ServiceConfig) + Clone>

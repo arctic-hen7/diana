@@ -3,7 +3,7 @@
 
 #![forbid(unsafe_code)]
 
-use diana_actix_web::{create_subscriptions_server, App, HttpServer};
+use diana_actix_web::{create_subscriptions_server, actix_web::{App, HttpServer}};
 
 // This 'dirty-imports' the code in `schema.in`
 // It will literally be interpolated here

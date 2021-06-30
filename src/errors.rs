@@ -3,6 +3,8 @@
 pub use error_chain::bail;
 use error_chain::error_chain;
 
+// TODO fix the integration errors
+
 // The `error_chain` setup for the whole crate
 // All systems use these errors, except for GraphQL resolvers, because they have to return a particular kind of error
 error_chain! {

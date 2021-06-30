@@ -7,7 +7,7 @@ use std::any::Any;
 
 use diana::{DianaHandler, DianaResponse, Options};
 
-/// A *very* generic error type that the lambda will accept as a return type.
+/// A *very* generic error type that the deployment system will accept as a return type.
 pub type AwsError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 // This allows us to propagate error HTTP responses more easily
@@ -77,7 +77,8 @@ fn parse_aws_res(res: DianaResponse) -> Result<Response<String>, AwsError> {
 }
 
 /// Runs a request for AWS Lambda or its derivatives (e.g. Netlify).
-/// This just takes the entire Lambda request and does all the processing for you, but it's really just a wrapper around [run_serverless_req].
+/// This just takes the entire Lambda request and does all the processing for you, but it's really just a wrapper around
+/// [`DianaHandler`](diana::DianaHandler).
 /// You should use this function in your Lambda handler as shown in the book.
 pub async fn run_aws_req<C, Q, M, S>(
     req: Request,
