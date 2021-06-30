@@ -4,7 +4,7 @@
 use async_graphql::{ObjectType, SubscriptionType};
 use std::any::Any;
 
-pub use crate::auth::middleware::AuthCheckBlockState; // Users should be able to easily access this
+pub use crate::auth::core::AuthCheckBlockState; // Users should be able to easily access this
 use crate::errors::*;
 pub use crate::graphql::{SubscriptionsServerInformation, UserSchema};
 
@@ -35,7 +35,7 @@ where
     pub authentication_block_state: AuthCheckBlockState,
     /// The endpoint for the GraphiQL playground.
     /// If nothing is provided here, the playground will be disabled.
-    /// Use with great care in production!
+    /// Not supported in production
     pub playground_endpoint: Option<String>,
     /// The GraphQL endpoint location. By default `/graphql`.
     pub graphql_endpoint: String,
@@ -171,7 +171,7 @@ where
     }
     /// Defines the GraphiQL playground endpoint.
     /// In development, this is not required and will default to `/graphiql`.
-    /// In production, the playground will be disabled by default (and should only be enabled with great caution!).
+    /// In production, if this has been set we'll throw an error at `.finish()`.
     pub fn playground_endpoint(mut self, playground_endpoint: &str) -> Self {
         self.playground_endpoint = Some(playground_endpoint.to_string());
         self
@@ -186,6 +186,11 @@ where
     /// Builds the final options, consuming `self`.
     /// This will return an error if you haven't set something required up.
     pub fn finish(self) -> Result<Options<C, Q, M, S>> {
+        // If the playground has been enabled in production, throw
+        if !cfg!(debug_assertions) && self.playground_endpoint.is_some() {
+            bail!(ErrorKind::AttemptedPlaygroundInProduction);
+        }
+
         let opts = Options {
             ctx: self.ctx.ok_or(ErrorKind::IncompleteBuilderFields)?,
             subscriptions_server_data: match self.use_subscriptions_server {

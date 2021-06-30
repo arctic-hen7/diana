@@ -38,26 +38,22 @@ mod aws_serverless;
 /// You'll also find [`GQLResult`](crate::errors::GQLResult) and [`GQLError`](crate::errors::Error) in here, which may be useful in working with your own resolvers.
 pub mod errors;
 mod graphql;
-mod graphql_server;
 /// The module for utility functions useful when developing your own schemas.
 pub mod graphql_utils; // Users need to be able to access these of course in their schemas
 mod options;
 mod pubsub;
-mod routes;
+mod diana_handler;
 mod serverless;
-mod subscriptions_server;
 
 // Public exports accessible from the root (everything the user will need)
+pub use crate::auth::core::AuthVerdict;
 pub use crate::auth::jwt::{create_jwt, decode_time_str, validate_and_decode_jwt, get_jwt_secret};
 pub use crate::aws_serverless::{run_aws_req, AwsError};
-pub use crate::graphql_server::create_graphql_server;
+pub use crate::diana_handler::{DianaHandler, DianaResponse};
 pub use crate::options::{AuthCheckBlockState, Options, OptionsBuilder};
 pub use crate::pubsub::Publisher;
 pub use crate::serverless::{run_serverless_req, ServerlessResponse};
-pub use crate::subscriptions_server::create_subscriptions_server;
 
-// Users shouldn't have to install Actix Web themselves for basic usage
-pub use actix_web::{App, HttpServer};
 // Users also shouldn't have to install the Netlify stuff themselves for basic usage
 pub use netlify_lambda_http::{
     lambda::{Context as LambdaCtx},

@@ -5,7 +5,7 @@
 use async_graphql::{ObjectType, Request, SubscriptionType};
 use std::any::Any;
 
-use crate::auth::middleware::{get_auth_verdict, get_token_state_from_header, AuthVerdict};
+use crate::auth::core::{get_auth_verdict, get_token_state_from_header, AuthVerdict};
 use crate::graphql::get_schema_without_subscriptions;
 use crate::options::Options;
 
@@ -79,6 +79,6 @@ where
             ServerlessResponse::Success(res_str)
         }
         AuthVerdict::Block => ServerlessResponse::Blocked,
-        AuthVerdict::Error => ServerlessResponse::Error,
+        AuthVerdict::Error(_) => ServerlessResponse::Error,
     }
 }

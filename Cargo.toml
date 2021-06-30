@@ -22,8 +22,6 @@ serde_json = "1.0.44"
 serde_derive = "1.0.103"
 tokio = { version = "1.0.1", features = ["full"] }
 async-graphql = "2.8.2"
-async-graphql-actix-web = "2.8.2"
-actix-web = "3.3.2"
 futures = "0.3.14"
 reqwest = { version = "0.10.10", default-features = false, features = ["rustls-tls", "json"] }
 async-stream = "0.3.1"
@@ -40,6 +38,13 @@ dotenv = "0.15.0"
 [lib]
 name = "diana"
 path = "src/lib.rs"
+
+# We pull in the integrations as workspace members, they're published as separate packages
+# Users shouldn't have to add code they don't want/need
+[workspace]
+members = [
+    "integrations/serverful/actix-web",
+]
 
 # This is all optimisation for the release binaries, mainly targeted at the serverless example
 # Netlify unfortunately doesn't like 20MB executables

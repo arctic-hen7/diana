@@ -3,13 +3,13 @@
 
 #![forbid(unsafe_code)]
 
-use diana::{create_subscriptions_server, App, HttpServer};
+use diana_actix_web::{create_subscriptions_server, App, HttpServer};
 
 // This 'dirty-imports' the code in `schema.in`
 // It will literally be interpolated here
 // Never use this in production unless you have a fantastic reason! Just import your code through Cargo!
 // We do this here though because you can't import from another example (which is annoying)
-include!("./netlify/schema.rs");
+include!("../../../../examples/netlify/schema.rs");
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

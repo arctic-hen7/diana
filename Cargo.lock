@@ -817,9 +817,7 @@ dependencies = [
 name = "diana"
 version = "0.1.1"
 dependencies = [
- "actix-web",
  "async-graphql",
- "async-graphql-actix-web",
  "async-stream",
  "aws_lambda_events",
  "chrono",
@@ -834,6 +832,22 @@ dependencies = [
  "serde_json",
  "tokio 1.7.1",
  "tokio-stream",
+]
+
+[[package]]
+name = "diana-actix-web"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "async-graphql",
+ "async-graphql-actix-web",
+ "diana",
+ "dotenv",
+ "error-chain",
+ "futures",
+ "serde",
+ "serde_json",
+ "tokio 1.7.1",
 ]
 
 [[package]]

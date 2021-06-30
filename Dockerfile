@@ -51,6 +51,8 @@ RUN mkdir -p /app \
 WORKDIR /app
 COPY --chown=node:node ./Cargo.lock Cargo.lock
 COPY ./Cargo.toml Cargo.toml
+# We also copy over all the manifests of all the integrations (workspace structure)
+COPY ./integrations/serverful/actix-web/Cargo.toml integrations/serverful/actix-web/Cargo.toml
 # Vendor all dependencies (stores them all locally, meaning they can be cached)
 RUN mkdir -p /app/.cargo
 RUN chown -Rh node:node /app/.cargo

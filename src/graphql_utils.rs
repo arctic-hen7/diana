@@ -55,11 +55,10 @@ macro_rules! if_authed(
                 test_claims.insert($key, $value);
             )+
             // Match the authentication state with those claims now
-            match $auth_state {
-                Some(auth_state) if auth_state.has_claims(test_claims) => {
-                    $code
-                },
-                _ => $crate::errors::bail!($crate::errors::ErrorKind::Unauthorised)
+            if $auth_state.has_claims(test_claims) {
+                $code
+            } else {
+                $crate::errors::bail!($crate::errors::ErrorKind::Unauthorised)
             }
         }
      };
@@ -125,9 +124,9 @@ pub fn get_stream_for_channel_from_ctx(
 /// surface of this crate).
 pub fn get_auth_data_from_ctx<'a>(
     raw_ctx: &'a async_graphql::Context<'_>,
-) -> Result<&'a Option<AuthState>> {
+) -> Result<&'a AuthState> {
     let auth_state = raw_ctx
-        .data::<Option<AuthState>>()
+        .data::<AuthState>()
         .map_err(|_err| ErrorKind::GraphQLContextNotFound("auth_state".to_string()))?;
 
     Ok(auth_state)

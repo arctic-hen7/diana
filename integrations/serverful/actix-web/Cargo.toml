@@ -1,0 +1,35 @@
+[package]
+name = "diana-actix-web"
+description = "The integration between Diana GraphQL and Actix Web."
+version = "0.1.0"
+authors = ["arctic_hen7 <arctic_hen7@pm.me>"]
+edition = "2018"
+license-file = "LICENSE"
+repository = "https://github.com/arctic-hen7/diana"
+homepage = "https://github.com/arctic-hen7/diana"
+keywords = ["graphql", "serverless", "authentication"]
+categories = ["web-programming", "web-programming::http-server", "web-programming::websocket"]
+include = [
+    "src/*",
+    "Cargo.toml",
+    "LICENSE",
+    "README.md"
+]
+
+[dependencies]
+diana = { path = "../../../" }
+serde = "1.0.103"
+serde_json = "1.0.44"
+tokio = { version = "1.0.1", features = ["full"] }
+futures = "0.3.14"
+async-graphql = "2.8.2"
+async-graphql-actix-web = "2.8.2"
+actix-web = "3.3.2"
+error-chain = "0.12.4"
+
+[dev-dependencies]
+dotenv = "0.15.0"
+
+[lib]
+name = "diana_actix_web"
+path = "src/lib.rs"

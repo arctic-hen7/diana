@@ -33,8 +33,8 @@ error_chain! {
 
         /// The subscriptions server failed to publish data it was asked to. This error is usually caused by an authentication failure.
         SubscriptionDataPublishFailed {
-            description("subscriptions server failed to publish data internally")
-            display("subscriptions server failed to publish data internally, this is most likely due to an authentication failure")
+            description("failed to publish data to the subscriptions server")
+            display("failed to publish data to the subscriptions server, this is most likely due to an authentication failure")
         }
 
         /// An invalid indicator string was used when trying to convert a timestring into a datetime.
@@ -65,6 +65,21 @@ error_chain! {
         InvokedSubscriptionsServerWithInvalidOptions {
             description("you tried to create a subscriptions server without configuring it in the options")
             display("you tried to create a subscriptions server without configuring it in the options")
+        }
+
+        /// There was an attempt to initialize the GraphiQL playground in a production environment
+        AttemptedPlaygroundInProduction {
+            description("you tried to initialize the GraphQL playground in production, which is not supported due to authentication issues")
+            display("you tried to initialize the GraphQL playground in production, which is not supported due to authentication issues")
+        }
+
+        IntegrationError(message: String, integration_name: String) {
+            description("an error occurred in one of Diana's integration libraries")
+            display(
+                "the following error occurred in the '{integration_name}' integration library: {message}",
+                integration_name=integration_name,
+                message=message
+            )
         }
     }
     // We work with many external libraries, all of which have their own errors

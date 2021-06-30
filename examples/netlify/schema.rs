@@ -36,7 +36,7 @@ impl Mutation {
         &self,
         raw_ctx: &async_graphql::Context<'_>,
     ) -> GQLResult<bool> {
-        // Imagine we've acquried this from the user's input
+        // Imagine we've acquired this from the user's input
         let user = User {
             username: "This is a username".to_string()
         };

@@ -126,7 +126,8 @@ impl Publisher {
             .json(&body)
             .header("Authorization", "Bearer ".to_string() + &self.token)
             .send()
-            .await?;
+            .await
+            .map_err(|_| ErrorKind::SubscriptionDataPublishFailed)?;
 
         // Handle if the request wasn't successful on an HTTP level
         if res.status().to_string() != "200 OK" {
@@ -134,7 +135,9 @@ impl Publisher {
         }
 
         // Get the body out (data still stringified though, that's handled by resolvers)
-        let body: GQLPublishResponse = serde_json::from_str(&res.text().await?)?;
+        let body: GQLPublishResponse = serde_json::from_str(
+            &res.text().await.map_err(|_| ErrorKind::SubscriptionDataPublishFailed)?
+        ).map_err(|_| ErrorKind::SubscriptionDataPublishFailed)?;
 
         // Confirm nothing's gone wrong on a GraphQL level (basically only if we got `false` instead of `true`)
         match body.data.publish {
