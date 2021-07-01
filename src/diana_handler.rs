@@ -81,10 +81,15 @@ where
     /// Determines ahead of time whether or not a request is authenticated. This should be used in middleware if possible so we can avoid
     /// sending full payloads if the auth token isn't even valid.
     /// This just takes the HTTP `Authorization` header and returns an [`AuthVerdict`].
-    pub fn is_authed(&self, raw_auth_header: Option<&str>) -> AuthVerdict {
+    pub fn is_authed(&self, raw_auth_header: Option<impl Into<String> + std::fmt::Display>) -> AuthVerdict {
+        // This function accepts anything that can be turned into a string for convenience
+        // Then we convert it into a definite Option<String>
+        let auth_header = raw_auth_header.map(|x| x.to_string());
+        // And then we get it as an Option<&str> (whic is what we need for slicing)
+        let auth_header_str = auth_header.as_deref();
         // Get a verdict on whether or not the user should be allowed through
         let token_state =
-            get_token_state_from_header(raw_auth_header, self.opts.jwt_secret.clone());
+            get_token_state_from_header(auth_header_str, self.opts.jwt_secret.clone());
         get_auth_verdict(token_state, self.opts.authentication_block_state)
     }
     /// Runs a query or mutation (stateless) given the request body and the value of the HTTP `Authorization` header.
