@@ -13,7 +13,7 @@ use crate::graphql::{
 use crate::options::Options;
 
 /// The basic response from a given request.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum DianaResponse {
     /// The request was successful and the response is attached.
     /// Return a 200.
@@ -28,7 +28,8 @@ pub enum DianaResponse {
 }
 
 // Represents the chice of the schema for/without subscriptions
-enum SysSchema {
+#[doc(hidden)]
+pub enum SysSchema {
     WithoutSubscriptions,
     ForSubscriptions,
 }
@@ -62,6 +63,7 @@ where
 {
     /// Creates a new instance of the handler with the given options.
     pub fn new(opts: Options<C, Q, M, S>) -> Result<Self> {
+        // TODO only create a schema for subscriptions if they're actually being used (will require broader logic changes)
         // Get the schema (this also creates a publisher to the subscriptions server and inserts context)
         // We deal with any errors directly with the serverless response enum
         let schema_without_subscriptions = get_schema_without_subscriptions(
@@ -72,7 +74,7 @@ where
         let schema_for_subscriptions =
             get_schema_for_subscriptions(opts.schema.clone(), opts.ctx.clone());
 
-        Ok(Self {
+        Ok(DianaHandler {
             opts,
             schema_without_subscriptions,
             schema_for_subscriptions,
@@ -81,7 +83,7 @@ where
     /// Determines ahead of time whether or not a request is authenticated. This should be used in middleware if possible so we can avoid
     /// sending full payloads if the auth token isn't even valid.
     /// This just takes the HTTP `Authorization` header and returns an [`AuthVerdict`].
-    pub fn is_authed(&self, raw_auth_header: Option<impl Into<String> + std::fmt::Display>) -> AuthVerdict {
+    pub fn is_authed<A: Into<String> + std::fmt::Display>(&self, raw_auth_header: Option<A>) -> AuthVerdict {
         // This function accepts anything that can be turned into a string for convenience
         // Then we convert it into a definite Option<String>
         let auth_header = raw_auth_header.map(|x| x.to_string());
@@ -97,10 +99,10 @@ where
     /// this can be provided as the third argument to avoid running auth checks twice.
     /// This will return a [`DianaResponse`] no matter what, which simplifies error handling significantly.
     /// This function is for the subscriptions system only.
-    pub async fn run_stateless_for_subscriptions(
+    pub async fn run_stateless_for_subscriptions<A: Into<String> + std::fmt::Display>(
         &self,
         body: String,
-        raw_auth_header: Option<&str>,
+        raw_auth_header: Option<A>,
         given_auth_verdict: Option<AuthVerdict>,
     ) -> DianaResponse {
         self.run_stateless_req(
@@ -116,10 +118,10 @@ where
     /// this can be provided as the third argument to avoid running auth checks twice.
     /// This will return a [`DianaResponse`] no matter what, which simplifies error handling significantly.
     /// This function is for the queries/mutations system only.
-    pub async fn run_stateless_without_subscriptions(
+    pub async fn run_stateless_without_subscriptions<A: Into<String> + std::fmt::Display>(
         &self,
         body: String,
-        raw_auth_header: Option<&str>,
+        raw_auth_header: Option<A>,
         given_auth_verdict: Option<AuthVerdict>,
     ) -> DianaResponse {
         self.run_stateless_req(
@@ -131,11 +133,13 @@ where
         .await
     }
     // This is used internally to provide query/mutation running functionality to the systems for/without subscriptions
-    async fn run_stateless_req(
+    // It is exposed to make testing easier, though users should not use it!
+    #[doc(hidden)]
+    pub async fn run_stateless_req<A: Into<String> + std::fmt::Display>(
         &self,
         which_schema: SysSchema,
         body: String,
-        raw_auth_header: Option<&str>,
+        raw_auth_header: Option<A>,
         given_auth_verdict: Option<AuthVerdict>,
     ) -> DianaResponse {
         // Run authentication checks if we need to (they may have already been run in middleware)

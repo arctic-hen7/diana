@@ -28,7 +28,7 @@ pub enum AuthBlockLevel {
     AllowMissing,
 }
 
-// Extracts an authentication state from the given Optio<String> token
+// Extracts an authentication state from the given Option<String> token
 // This is exposed as a primitive for serverful and serverless authentication logic
 pub fn get_token_state_from_header(
     auth_header: Option<&str>,

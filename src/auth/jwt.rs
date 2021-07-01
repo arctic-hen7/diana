@@ -6,12 +6,13 @@ use std::collections::HashMap;
 use crate::errors::*;
 
 // We make the claims very generic
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct Claims {
     pub exp: u64,
     pub claims: HashMap<String, String>, // The additional claims the user makes (as generic as possible)
 }
 
+#[derive(Debug)]
 pub struct JWTSecret<'a> {
     encoding_key: EncodingKey,
     decoding_key: DecodingKey<'a>,

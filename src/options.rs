@@ -1,6 +1,8 @@
 // Contains the logic to actually create the GraphQL server that the user will use
 // This file does not include any logic for the subscriptions server
 
+// TODO convert the JWT to a fully-fledged secret straight away from here for efficiency
+
 use async_graphql::{ObjectType, SubscriptionType};
 use std::any::Any;
 
