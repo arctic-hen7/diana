@@ -1,16 +1,18 @@
-use diana::{Options, OptionsBuilder, AuthBlockLevel};
-use async_graphql::{Object as GQLObject, EmptyMutation, EmptySubscription};
+use async_graphql::{EmptyMutation, EmptySubscription, Object as GQLObject};
+use diana::{AuthBlockLevel, Options, OptionsBuilder};
 
 #[derive(Clone)]
 struct Context {
-    prop: String
+    prop: String,
 }
 
 #[derive(Clone)]
 struct Query {}
 #[GQLObject]
 impl Query {
-    async fn query(&self) -> bool { true }
+    async fn query(&self) -> bool {
+        true
+    }
 }
 
 #[test]
@@ -93,12 +95,13 @@ fn uses_default_playground_endpoint() {
     if !matches!(opts, Ok(Options { .. })) {
         panic!("Didn't return valid Options instance.")
     }
-    assert_eq!(opts.unwrap().playground_endpoint, Some("/graphiql".to_string()))
+    assert_eq!(
+        opts.unwrap().playground_endpoint,
+        Some("/graphiql".to_string())
+    )
 }
 #[test]
-fn returns_error_on_playground_in_production() {
-
-}
+fn returns_error_on_playground_in_production() {}
 #[test]
 fn returns_error_on_missing_subscriptions_server_fields() {
     if matches!(

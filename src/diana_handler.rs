@@ -83,7 +83,10 @@ where
     /// Determines ahead of time whether or not a request is authenticated. This should be used in middleware if possible so we can avoid
     /// sending full payloads if the auth token isn't even valid.
     /// This just takes the HTTP `Authorization` header and returns an [`AuthVerdict`].
-    pub fn is_authed<A: Into<String> + std::fmt::Display>(&self, raw_auth_header: Option<A>) -> AuthVerdict {
+    pub fn is_authed<A: Into<String> + std::fmt::Display>(
+        &self,
+        raw_auth_header: Option<A>,
+    ) -> AuthVerdict {
         // This function accepts anything that can be turned into a string for convenience
         // Then we convert it into a definite Option<String>
         let auth_header = raw_auth_header.map(|x| x.to_string());

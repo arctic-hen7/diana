@@ -2,15 +2,13 @@
 // This is the verbatim process of manual testing that would be gone through to tests these systems
 // This testing is brittle only to the schema, and tests the full E2E result of the system, removing the need to test many smaller components
 
+use diana::{create_jwt, decode_time_str, get_jwt_secret};
 use diana_actix_web::{
     actix_web::{App, HttpServer},
     create_graphql_server, create_subscriptions_server,
 };
-use diana::{
-    create_jwt, get_jwt_secret, decode_time_str
-};
-use std::collections::HashMap;
 use reqwest::Client;
+use std::collections::HashMap;
 use tungstenite::{connect, Message};
 
 // This 'dirty-imports' the code in `schema.in`
@@ -98,29 +96,48 @@ macro_rules! shutdown_all(
 #[actix_web::rt::test]
 async fn e2e() {
     // Get the configurations for the two servers
-    let graphql_configurer = create_graphql_server(get_opts()).expect("Failed to set up queries/mutationsconfigurer!");
-    let susbcriptions_configurer = create_subscriptions_server(get_opts()).expect("Failed to set up subscriptions configurer!");
+    let graphql_configurer =
+        create_graphql_server(get_opts()).expect("Failed to set up queries/mutationsconfigurer!");
+    let susbcriptions_configurer = create_subscriptions_server(get_opts())
+        .expect("Failed to set up subscriptions configurer!");
 
     // Initialise both of them
     let graphql_server = HttpServer::new(move || App::new().configure(graphql_configurer.clone()))
-        .bind("0.0.0.0:9001").expect("Couldn't bind to port 9001 in test.")
+        .bind("0.0.0.0:9001")
+        .expect("Couldn't bind to port 9001 in test.")
         .run();
-    let subscriptions_server = HttpServer::new(move || App::new().configure(susbcriptions_configurer.clone()))
-        .bind("0.0.0.0:9002").expect("Couldn't bind to port 9002 in test.")
-        .run();
+    let subscriptions_server =
+        HttpServer::new(move || App::new().configure(susbcriptions_configurer.clone()))
+            .bind("0.0.0.0:9002")
+            .expect("Couldn't bind to port 9002 in test.")
+            .run();
 
     // Testing code from here on
     // We establish a connection to the subscriptions server first so we can listen to the messages it receives after mutations
-    let (mut socket, _) =
-        connect("ws://localhost:9002/graphql").unwrap();
-    socket.write_message(Message::Text("{\"type\": \"connection_init\", \"payload\": {}}".to_string())).unwrap();
+    let (mut socket, _) = connect("ws://localhost:9002/graphql").unwrap();
+    socket
+        .write_message(Message::Text(
+            "{\"type\": \"connection_init\", \"payload\": {}}".to_string(),
+        ))
+        .unwrap();
     socket.write_message(Message::Text("{\"id\": \"1\", \"type\": \"start\", \"payload\": {\"query\": \"subscription { newBlahs { username } }\"}}".to_string())).unwrap();
     expect_subscription_to_connect!(socket);
 
     let client = Client::new();
-    req_test!(client, "{\"query\": \"query { apiVersion }\"}", "{\"data\":{\"apiVersion\":\"0.1.0\"}}");
-    req_test!(client, "{\"query\": \"mutation { updateBlah }\"}", "{\"data\":{\"updateBlah\":true}}"); // This will also test communication with the subscriptions server (it would return an error on failure)
-    expect_subscription_res!(socket, "{\"data\":{\"newBlahs\":{\"username\":\"This is a username\"}}}");
+    req_test!(
+        client,
+        "{\"query\": \"query { apiVersion }\"}",
+        "{\"data\":{\"apiVersion\":\"0.1.0\"}}"
+    );
+    req_test!(
+        client,
+        "{\"query\": \"mutation { updateBlah }\"}",
+        "{\"data\":{\"updateBlah\":true}}"
+    ); // This will also test communication with the subscriptions server (it would return an error on failure)
+    expect_subscription_res!(
+        socket,
+        "{\"data\":{\"newBlahs\":{\"username\":\"This is a username\"}}}"
+    );
 
     // Close the WS connection
     // We need to continue reading messages until the server confirms because that's how WS handshakes work

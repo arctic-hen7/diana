@@ -35,7 +35,7 @@ mod pubsub;
 // Public exports accessible from the root (everything the user will need)
 pub use crate::auth::core::{AuthBlockLevel, AuthVerdict};
 pub use crate::auth::jwt::{create_jwt, decode_time_str, get_jwt_secret, validate_and_decode_jwt};
-pub use crate::diana_handler::{SysSchema, DianaHandler, DianaResponse};
+pub use crate::diana_handler::{DianaHandler, DianaResponse, SysSchema};
 pub use crate::options::{Options, OptionsBuilder};
 pub use crate::pubsub::Publisher;
 
