@@ -74,7 +74,7 @@ pub fn decode_time_str(time_str: &str) -> Result<u64> {
     // Form the final duration by reducing the durations vector into one
     let datetime = current + duration_after_current;
 
-    Ok(datetime.timestamp() as u64) // As Unix timestamp
+    Ok(datetime.timestamp() as u64) // As Unix timestamp in u64 because that's what the JWT demands (we can't have expiries before January 1st 1970, let me know if that's a problem!)
 }
 
 /// Creates a new JWT. You should use this to issue all client JWTs and create the initial JWT for communication with the subscriptions

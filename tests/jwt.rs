@@ -1,7 +1,9 @@
+use chrono::{Duration, Utc};
 use diana::{create_jwt, decode_time_str, get_jwt_secret, validate_and_decode_jwt};
 use std::collections::HashMap;
 
 const JWT_SECRET: &str = "thisisaterriblesecretthatshouldberandomlygeneratedseethebook";
+const NUM_INTERVAL_LENGTHS_TO_TEST: i64 = 1000;
 
 // Tests for `get_jwt_secret`
 #[test]
@@ -20,7 +22,62 @@ fn returns_error_if_invalid() {
         panic!("Expected Err, found {:?}", secret);
     }
 }
-// TODO: Tests for `decode_time_str`
+// Tests for `decode_time_str`
+// A testing utility macro to test all the intervals with `decode_time_str` for a given length
+macro_rules! test_all_intervals_for_length(
+    ($length:expr) => {
+        {
+            assert_eq!(
+                decode_time_str(($length.to_string() + "s").as_str()).unwrap(),
+                (Utc::now() + Duration::seconds($length)).timestamp() as u64
+            );
+            assert_eq!(
+                decode_time_str(($length.to_string() + "m").as_str()).unwrap(),
+                (Utc::now() + Duration::minutes($length)).timestamp() as u64
+            );
+            assert_eq!(
+                decode_time_str(($length.to_string() + "h").as_str()).unwrap(),
+                (Utc::now() + Duration::hours($length)).timestamp() as u64
+            );
+            assert_eq!(
+                decode_time_str(($length.to_string() + "d").as_str()).unwrap(),
+                (Utc::now() + Duration::days($length)).timestamp() as u64
+            );
+            assert_eq!(
+                decode_time_str(($length.to_string() + "w").as_str()).unwrap(),
+                (Utc::now() + Duration::weeks($length)).timestamp() as u64
+            );
+            assert_eq!(
+                decode_time_str(($length.to_string() + "M").as_str()).unwrap(),
+                (Utc::now() + Duration::days($length * 30)).timestamp() as u64
+            );
+            assert_eq!(
+                decode_time_str(($length.to_string() + "y").as_str()).unwrap(),
+                (Utc::now() + Duration::days($length * 365)).timestamp() as u64
+            );
+        }
+     };
+);
+#[test]
+fn returns_correct_datetime_for_each_interval_at_length_1() {
+    // We test each interval directly with the above macro
+    test_all_intervals_for_length!(1);
+}
+#[test]
+fn returns_correct_datetime_for_each_interval_at_many_length() {
+    // We test each interval directly with the above macro
+    // This tests runs for many intervals
+    for length in 1..NUM_INTERVAL_LENGTHS_TO_TEST {
+        test_all_intervals_for_length!(length);
+    }
+}
+#[test]
+fn returns_error_on_invalid_interval() {
+    let decoded = decode_time_str("1q");
+    if decoded.is_ok() {
+        panic!("Didn't panic on time string with invalid interval.");
+    }
+}
 // Tests for `create_jwt`
 #[test]
 fn returns_valid_jwt() {
