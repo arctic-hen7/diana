@@ -24,11 +24,20 @@ fn get_data_from_aws_req(req: Request) -> Result<AwsReqData, AwsError> {
     let body = req.body();
     let body = match body {
         Body::Text(body_str) => body_str.to_string(),
-        Body::Binary(_) => {
-            let res = Response::builder()
-                .status(400) // Invalid request
-                .body("Found binary body, expected string".to_string())?;
-            return Ok(AwsReqData::Invalid(res));
+        // Binary bodies are fine as long as we can serialise them into strings
+        Body::Binary(body_binary) => {
+            let body_str = std::str::from_utf8(&body_binary);
+            match body_str {
+                Ok(body_str) => body_str.to_string(),
+                Err(_) => {
+                    let res = Response::builder()
+                        .status(400) // Invalid request
+                        .body(
+                            "Found binary body that couldn't be serialized to string".to_string(),
+                        )?;
+                    return Ok(AwsReqData::Invalid(res));
+                }
+            }
         }
         Body::Empty => {
             let res = Response::builder()
