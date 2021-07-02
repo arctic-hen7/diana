@@ -18,7 +18,7 @@ sh = "bonnie dc run --entrypoint \"/bin/zsh\" --use-aliases --rm playground"
 doc = "cargo doc"
 test = "cargo watch -x \"test\""
 dev = "cargo watch -x \"check\""
-check = "cargo check --all && cargo fmt --all -- --check && cargo clippy --all && cargo test --all" # This will be run on CI as well
+check = "cargo check --all && cargo fmt --all -- --check && cargo clippy --all && cargo test --all" # This will be run on CI as well (ignoring expensive tests)
 example = { cmd = "cargo watch -x \"run --example %example_name\"", args = ["example_name"] }
 serverless-compile = "cd examples/netlify && sh build.sh"
 serverless-deploy = "bonnie serverless compile && netlify deploy --prod"

@@ -1,0 +1,2 @@
+# The file where the URl of the local Netlify deployment is stored
+.env.local
