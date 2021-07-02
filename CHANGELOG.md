@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.2](https://github.com/diana-graphql/diana/compare/v0.2.1...v0.2.2) (2021-07-02)
+
+
+### Bug Fixes
+
+* 🐛 fixed type inference failure after `DianaHandler` changes ([a8a854c](https://github.com/diana-graphql/diana/commit/a8a854c96e808080f3a0e3fce4cb193acb609e04))
+* 🐛 support binary bodies that can be serialized to strings in lambda integration ([b55ce88](https://github.com/diana-graphql/diana/commit/b55ce88dbbd69d4856ef96ad517fa9e2f7110dc5))
+
+
+### Code Refactorings
+
+* ♻️ made `DianaHandler.is_authed()` accept `Option<Into<String>>` ([c76aee0](https://github.com/diana-graphql/diana/commit/c76aee08a220dcef51fac94c1561afd16b3de732))
+
 ### [0.2.1](https://github.com/diana-graphql/diana/compare/v0.2.0...v0.2.1) (2021-06-30)
 
 
