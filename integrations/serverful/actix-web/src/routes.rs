@@ -26,7 +26,7 @@ where
 
     // Run the query, stating that authentication checks don't need to be performed again
     let res = diana_handler
-        .run_stateless_without_subscriptions(body, None, auth_verdict)
+        .run_stateless_without_subscriptions(body, Option::<String>::None, auth_verdict)
         .await;
 
     // Transform the DianaResponse into an HttpResponse
@@ -55,7 +55,7 @@ where
 
     // Run the query, stating that authentication checks don't need to be performed again
     let res = diana_handler
-        .run_stateless_for_subscriptions(body, None, auth_verdict)
+        .run_stateless_for_subscriptions(body, Option::<String>::None, auth_verdict)
         .await;
 
     // Transform the DianaResponse into an HttpResponse
