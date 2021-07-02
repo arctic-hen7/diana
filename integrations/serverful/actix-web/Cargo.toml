@@ -27,6 +27,10 @@ actix-web = "3.3.2"
 
 [dev-dependencies]
 dotenv = "0.15.0"
+tokio = "1.3.0"
+reqwest = { version = "0.10.10", default-features = false, features = ["rustls-tls", "json"] }
+tungstenite = { version = "0.13.0", features = ["rustls-tls"] }
+actix-rt = "1.1.1"
 
 [lib]
 name = "diana_actix_web"
