@@ -17,7 +17,6 @@ you just change one file!
 
 This documentation does not contain examples, which can be found in the [GitHub repository](https://github.com/diana-graphql/diana). More
 detailed explanations and tutorials can be found in the [book](https://diana-graphql.github.io).
-```
 */
 
 mod auth;
