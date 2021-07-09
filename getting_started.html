@@ -148,8 +148,9 @@
 <h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
 <p>Assuming you have Rust already installed (if not, <a href="https://www.rust-lang.org/tools/install">here's</a> a guide on how to do so), you can add Diana as a dependency to your project easily by adding the following to your project's <code>Cargo.toml</code> under <code>[dependencies]</code>:</p>
 <pre><code>diana = &quot;0.2.3&quot;
+async-graphql = &quot;2.8.2&quot;
 </code></pre>
-<p>Now run <code>cargo build</code> to download all dependencies. Diana is large and complex, so this will take quite a while!</p>
+<p>We also install <code>async_graphql</code> directly to prevent errors with asynchronous usage. Now run <code>cargo build</code> to download all dependencies. Diana is large and complex, so this will take quite a while!</p>
 <p>If you're new to GraphQL, we highly recommend reading more about it before diving further into Diana. You can see more about it on the <a href="https://graphql.org">official GraphQL website</a>.</p>
 <h2 id="project-structure"><a class="header" href="#project-structure">Project Structure</a></h2>
 <p>We recommend a specific project structure for new projects using Diana, but it's entirely optional! It is however designed to minimize code duplication and maximize efficiency by allowing you to run both the queries/mutations system and the subscriptions server simultaneously.</p>
