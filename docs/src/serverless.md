@@ -9,7 +9,7 @@ Crucially, **no part of your schemas or options** should have to change to go se
 First off, install `diana-aws-lambda` by adding the following to your `Cargo.toml` for the `serverless` crate under `[dependencies]` (notice that versions of integrations and the core library are kept in sync deliberately):
 
 ```toml
-diana-aws-lambda = "0.2.2"
+diana-aws-lambda = "0.2.3"
 ```
 
 ```rust
@@ -72,7 +72,7 @@ cp ./target/x86_64-unknown-linux-musl/release/serverless functions
 
 This will compile your binary for production and copy it to the `functions` directory, where Netlify can access it. Note that we're compiling for the `x86_64-unknown-linux-musl` target triple, which is the environment on Netlify's servers. To be able to compile for that target (a variant of Linux), you'll need to add it with `rustup target add x86_64-unknown-linux-musl`, which will download what you need.
 
-There's one more thing we have to do before we can deploy though, and that's minimizing the size of the binary. Rust by default creates very large binaries, optimizing for speed instead. Diana is large and complex, which exacerbates this problem. Netlify does not like large binaries. At all. Which means we need to slim our release binary down significantly. However, because Netlify support for Rust is in beta, certain very powerful optimizations (like running `strip` to halve the size) will result in Netlify being unable to even detect your binary. Add the following to your *root* `Cargo.toml` (the one for all your crates):
+There's one more thing we have to do before we can deploy though, and that's minimizing the size of the binary. Rust by default creates very large binaries, optimizing for speed instead. Diana is large and complex, which exacerbates this problem. Netlify does not like large binaries. At all. Which means we need to slim our release binary down significantly. However, because Netlify support for Rust is in beta, certain very powerful optimizations (like running `strip` to halve the size) will result in Netlify being unable to even detect your binary. Add the following to your _root_ `Cargo.toml` (the one for all your crates):
 
 ```toml
 [profile.release]
@@ -81,7 +81,7 @@ codegen-units = 1
 panic = "abort"
 ```
 
-This changes the compiler to optimize for size rather than speed, removes extra unnecessary optimization code, and removes the entire panic handling matrix. What this means is that your binary becomes smaller, which is great! However, if your program happens to `panic!` in production, it will just abort, so if you have *any* custom panic handling logic, you'll need to play around with this a bit. Netlify will generally accept binaries under 15MB. Now there are more optimizations we could apply here to make the binary tiny, but then Netlify can't even detect it, so this is the best we can do (if you have something else that works better, please [open an issue](https://github.com/diana-graphql/diana/issues/new)).
+This changes the compiler to optimize for size rather than speed, removes extra unnecessary optimization code, and removes the entire panic handling matrix. What this means is that your binary becomes smaller, which is great! However, if your program happens to `panic!` in production, it will just abort, so if you have _any_ custom panic handling logic, you'll need to play around with this a bit. Netlify will generally accept binaries under 15MB. Now there are more optimizations we could apply here to make the binary tiny, but then Netlify can't even detect it, so this is the best we can do (if you have something else that works better, please [open an issue](https://github.com/diana-graphql/diana/issues/new)).
 
 Finally, you can run `sh build.sh` to build your function! Now we just need to send it to Netlify!
 

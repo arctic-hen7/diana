@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.3](https://github.com/diana-graphql/diana/compare/v0.2.2...v0.2.3) (2021-07-09)
+
+
+### Documentation Changes
+
+* **book:** 📝 wrote book ([10739d5](https://github.com/diana-graphql/diana/commit/10739d5cb609ead61bb2f720253225df3e64c73e))
+* 📝 updated readme ([45cca35](https://github.com/diana-graphql/diana/commit/45cca3553f43c6af3d037c7bb93e5ab03f12fb87))
+
 ### [0.2.2](https://github.com/diana-graphql/diana/compare/v0.2.1...v0.2.2) (2021-07-02)
 
 
