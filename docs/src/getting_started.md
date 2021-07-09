@@ -8,9 +8,10 @@ Assuming you have Rust already installed (if not, [here's](https://www.rust-lang
 
 ```
 diana = "0.2.3"
+async-graphql = "2.8.2"
 ```
 
-Now run `cargo build` to download all dependencies. Diana is large and complex, so this will take quite a while!
+We also install `async_graphql` directly to prevent errors with asynchronous usage. Now run `cargo build` to download all dependencies. Diana is large and complex, so this will take quite a while!
 
 If you're new to GraphQL, we highly recommend reading more about it before diving further into Diana. You can see more about it on the [official GraphQL website](https://graphql.org).
 
