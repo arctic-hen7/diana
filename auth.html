@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Introduction - Diana Book</title>
+        <title>Authentication - Diana Book</title>
                 
 
         <!-- Custom HTML head -->
@@ -82,7 +82,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="getting_started.html"><strong aria-hidden="true">2.</strong> Getting Started</a></li><li class="chapter-item expanded "><a href="writing_schemas.html"><strong aria-hidden="true">3.</strong> Writing Schemas</a></li><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="auth.html"><strong aria-hidden="true">5.</strong> Authentication</a></li><li class="chapter-item expanded "><a href="serverless.html"><strong aria-hidden="true">6.</strong> Going Serverless</a></li><li class="chapter-item expanded "><a href="core/getting_started.html"><strong aria-hidden="true">7.</strong> Core Library</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="core/queries_mutations.html"><strong aria-hidden="true">7.1.</strong> Handling Queries and Mutations</a></li><li class="chapter-item expanded "><a href="core/auth.html"><strong aria-hidden="true">7.2.</strong> Authentication</a></li></ol></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="getting_started.html"><strong aria-hidden="true">2.</strong> Getting Started</a></li><li class="chapter-item expanded "><a href="writing_schemas.html"><strong aria-hidden="true">3.</strong> Writing Schemas</a></li><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="auth.html" class="active"><strong aria-hidden="true">5.</strong> Authentication</a></li><li class="chapter-item expanded "><a href="serverless.html"><strong aria-hidden="true">6.</strong> Going Serverless</a></li><li class="chapter-item expanded "><a href="core/getting_started.html"><strong aria-hidden="true">7.</strong> Core Library</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="core/queries_mutations.html"><strong aria-hidden="true">7.1.</strong> Handling Queries and Mutations</a></li><li class="chapter-item expanded "><a href="core/auth.html"><strong aria-hidden="true">7.2.</strong> Authentication</a></li></ol></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -143,21 +143,34 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
-<p>Welcome to the Diana Book! Right now, this is still under construction, but check back soon for a full guide on how to use Diana!</p>
+                        <h1 id="authentication"><a class="header" href="#authentication">Authentication</a></h1>
+<p>Authentication is built into Diana out of the box using JWTs. It's designed to be as intuitive as possible, but there are a few things you should know when working with it.</p>
 <blockquote>
-<p><strong>Pragmatic GraphQL that just works.</strong></p>
+<p>🚧 Authentication is not yet supported over subscriptions, this will be added soon! 🚧</p>
 </blockquote>
-<p><a href="https://github.com/diana-graphql/diana">Diana</a> • <a href="https://crates.io/crates/diana">Crate Page</a> • <a href="https://docs.rs/diana">API Documentation</a> • <a href="./CONTRIBUTING.html">Contributing</a></p>
-<p>Welcome to the Diana book, the central location for all Diana documentation! This is designed to be read in order, but each page should also be self-containing for later reference. If you find an issue with this documentation or you'd like to contribute in any way to the project, please <a href="https://github.com/diana-graphql/diana/issues/new/choose">open an issue</a> and let us know!</p>
-<p>If you're looking for a more general overview of the project, please see the <a href="https://github.com/diana-graphql/diana">README</a>.</p>
+<h2 id="authentication-block-level"><a class="header" href="#authentication-block-level">Authentication Block Level</a></h2>
+<p>In your configuration, you define a required level of authentication for your GraphQL endpoints using <code>.auth_block_state()</code>. The different levels are explained on <a href="./config.html">the configuration page</a>, so all that will be added now is that they apply to all GraphQL endpoints, from both the queries/mutations and the subscriptions systems. <code>BlockUnauthenticated</code> is vastly preferred and recommended in production.</p>
+<h2 id="jwts"><a class="header" href="#jwts">JWTs</a></h2>
+<p>Diana has full support for JWTs out of the box, and uses them internally to allow connections between its two systems. That means that you will need to create a JWT to enable this communication, which can be done using <code>diana::create_jwt</code>! Diana provides a few function for managing JWTs: <code>create_jwt</code>, <code>validate_and_decode_jwt</code>, <code>get_jwt_secret</code>, and <code>decode_time_str</code>. Those are all pretty self-explanatory except perhaps the last one, which turns strings like <code>1w</code> into one week from the present datetime in seconds after January 1st 1970 (Unix epoch), allowing you to more conveniently define JWT expiries. This is based on Vercel's <a href="https://github.com/vercel/ms">ms</a> module for JavaScript, though only implements a subset of its features.</p>
+<p>The documentation for those functions is best seen directly in raw form <a href="https://docs.rs/diana">here</a>. The most important thing to know is that the JWT for connecting to the subscriptions server MUST define the <code>role</code> property in its payload to be <code>graphql_server</code>. Otherwise authentication will fail for <code>BlockUnauthenticated</code> and <code>AllowMissing</code>.</p>
+<h2 id="graphiql"><a class="header" href="#graphiql">GraphiQL</a></h2>
+<p>GraphiQL is currently only supported in development (it will be disabled by force in production), and so there is as yet no need for authenticating for access to it. If and when it is usable in production, this will come with an authentication system for it.</p>
+<p>In development, you may need to provide a JWT that you've generated in order to test authentication. You can do this by opening the <em>Headers</em> panel at the bottom of the screen and typing the following:</p>
+<pre><code class="language-json">{
+	&quot;Authorization&quot;: &quot;Bearer YOUR_TOKEN_HERE&quot;
+}
+</code></pre>
+<p>Please note that authentication is not yet supported for subscriptions, and so this will have no effect on them (equivalent to a permanent <code>AllowAll</code>).</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                                                    <a rel="prev" href="config.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
                         
-                                                    <a rel="next" href="getting_started.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                                    <a rel="next" href="serverless.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -167,8 +180,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                                    <a rel="prev" href="config.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
                 
-                                    <a rel="next" href="getting_started.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                    <a rel="next" href="serverless.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                             </nav>

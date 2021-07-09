@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Introduction - Diana Book</title>
+        <title>Configuration - Diana Book</title>
                 
 
         <!-- Custom HTML head -->
@@ -82,7 +82,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="getting_started.html"><strong aria-hidden="true">2.</strong> Getting Started</a></li><li class="chapter-item expanded "><a href="writing_schemas.html"><strong aria-hidden="true">3.</strong> Writing Schemas</a></li><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="auth.html"><strong aria-hidden="true">5.</strong> Authentication</a></li><li class="chapter-item expanded "><a href="serverless.html"><strong aria-hidden="true">6.</strong> Going Serverless</a></li><li class="chapter-item expanded "><a href="core/getting_started.html"><strong aria-hidden="true">7.</strong> Core Library</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="core/queries_mutations.html"><strong aria-hidden="true">7.1.</strong> Handling Queries and Mutations</a></li><li class="chapter-item expanded "><a href="core/auth.html"><strong aria-hidden="true">7.2.</strong> Authentication</a></li></ol></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="getting_started.html"><strong aria-hidden="true">2.</strong> Getting Started</a></li><li class="chapter-item expanded "><a href="writing_schemas.html"><strong aria-hidden="true">3.</strong> Writing Schemas</a></li><li class="chapter-item expanded "><a href="config.html" class="active"><strong aria-hidden="true">4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="auth.html"><strong aria-hidden="true">5.</strong> Authentication</a></li><li class="chapter-item expanded "><a href="serverless.html"><strong aria-hidden="true">6.</strong> Going Serverless</a></li><li class="chapter-item expanded "><a href="core/getting_started.html"><strong aria-hidden="true">7.</strong> Core Library</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="core/queries_mutations.html"><strong aria-hidden="true">7.1.</strong> Handling Queries and Mutations</a></li><li class="chapter-item expanded "><a href="core/auth.html"><strong aria-hidden="true">7.2.</strong> Authentication</a></li></ol></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -143,21 +143,71 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
-<p>Welcome to the Diana Book! Right now, this is still under construction, but check back soon for a full guide on how to use Diana!</p>
-<blockquote>
-<p><strong>Pragmatic GraphQL that just works.</strong></p>
-</blockquote>
-<p><a href="https://github.com/diana-graphql/diana">Diana</a> • <a href="https://crates.io/crates/diana">Crate Page</a> • <a href="https://docs.rs/diana">API Documentation</a> • <a href="./CONTRIBUTING.html">Contributing</a></p>
-<p>Welcome to the Diana book, the central location for all Diana documentation! This is designed to be read in order, but each page should also be self-containing for later reference. If you find an issue with this documentation or you'd like to contribute in any way to the project, please <a href="https://github.com/diana-graphql/diana/issues/new/choose">open an issue</a> and let us know!</p>
-<p>If you're looking for a more general overview of the project, please see the <a href="https://github.com/diana-graphql/diana">README</a>.</p>
+                        <h1 id="configuration"><a class="header" href="#configuration">Configuration</a></h1>
+<p>Diana is configured using the <code>Options</code> struct. This page will go through in detail what can be specified using that system. Here's an example options initialization that we'll work through:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>OptionsBuilder::new()
+        .ctx(Context(&quot;test&quot;.to_string()))
+        .subscriptions_server_hostname(&quot;http://localhost&quot;)
+        .subscriptions_server_port(&quot;9002&quot;)
+        .subscriptions_server_endpoint(&quot;/graphql&quot;)
+        .jwt_to_connect_to_subscriptions_server(
+            &amp;env::var(&quot;SUBSCRIPTIONS_SERVER_PUBLISH_JWT&quot;).unwrap(),
+        )
+        .auth_block_state(AuthBlockLevel::AllowAll)
+        .jwt_secret(&amp;env::var(&quot;JWT_SECRET&quot;).unwrap())
+        .schema(Query {}, Mutation {}, Subscription {})
+        .graphql_endpoint(&quot;/graphql&quot;)
+		.playground_endpoint(&quot;/graphiql&quot;)
+        .finish()
+        .expect(&quot;Failed to build options!&quot;)
+<span class="boring">}
+</span></code></pre></pre>
+<h2 id="context"><a class="header" href="#context">Context</a></h2>
+<p>You must provide a context struct to Diana by using the <code>.ctx()</code> function. This struct will be parsed to all resolvers, and can be trivially accessed by using this in your resolvers:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let ctx = raw_ctx.data&lt;Context&gt;()?;
+<span class="boring">}
+</span></code></pre></pre>
+<p>A common use of the context struct is for a database pool.</p>
+<h2 id="subscriptions-server-configuration"><a class="header" href="#subscriptions-server-configuration">Subscriptions server configuration</a></h2>
+<p>You need to provide the details of the subscriptions server in your configuration so the queries/mutation system knows where it is on the internet. This is defined using these four functions:</p>
+<ul>
+<li><code>.subscriptions_server_hostname()</code> -- the hostname of the subscriptions server (e.g. <code>http://localhost</code></li>
+<li><code>.subscriptions_server_port()</code> -- the port the subscriptions server is running on</li>
+<li><code>.subscriptions_server_endpoint()</code> -- the GraphQL endpoint to connect to on the subscriptions server (e.g. <code>/graphql</code>)</li>
+<li><code>.jwt_to_connect_to_subscriptions_server()</code> -- a JWT to use to authenticate against the subscriptions server, which must be signed with the secret define by <code>.jwt_secret()</code>; this JWT must have a payload which defines <code>role: &quot;graphql_server&quot;</code> (see <a href="./auth.html">Authentication</a>)</li>
+</ul>
+<p>If you aren't using subscriptions at all in your setup, you don't have to use any of these functions.</p>
+<h2 id="authentication"><a class="header" href="#authentication">Authentication</a></h2>
+<p>Two properties define authentication data for Diana: <code>.jwt_secret()</code> and <code>.auth_block_state()</code>. The former defines the string secret to use to sign all JWTs (internally used for the communication channel between the two systems of Diana, you can use it too for authenticating clients). The latter defines the level of authentication required to connect to the GraphQL endpoint. This can be one of the following:</p>
+<ul>
+<li><code>AuthBlockLevel::AllowAll</code> -- allows everything, only ever use this in development unless you have an excellent reason</li>
+<li><code>AuthBlockLevel::BlockUnauthenticated</code> -- blocks anything without a valid JWT</li>
+<li><code>AuthBlockLevel::AllowMissing</code> -- blocks invalid tokens, but allows requests without tokens; this is designed for development use to show authentication while also allowing GraphiQL introspection (the hints and error messages like an IDE); do NOT use this in production!</li>
+</ul>
+<h2 id="endpoints"><a class="header" href="#endpoints">Endpoints</a></h2>
+<p>The two functions <code>.graphql_endpoint()</code> and <code>.playground_endpoint</code> define the locations of your GraphQL endpoint and the endpoint for the GraphiQL playground, though you probably won't use them unless you're using something novel, they are set to <code>/graphql</code> and <code>/graphiql</code> respectively by default.</p>
+<h2 id="schema"><a class="header" href="#schema">Schema</a></h2>
+<p>The last function is <code>.schema()</code>, which defines the actual schema for your app. You'll need to provide your <code>Query</code>, <code>Mutation</code> and <code>Subscription</code> types here. If you're not using subscriptions, you can use <code>diana::async_graphql::EmptySubscription</code> instead. There's also an <code>EmptyMutation</code> type if you need it. At least one query is mandatory. You should initialize each of these structs for this function with this notation:</p>
+<pre><code>Query {}
+</code></pre>
+<h2 id="building-it"><a class="header" href="#building-it">Building it</a></h2>
+<p>Once you've run all those functions, you can build the <code>Options</code> by using <code>.finish()</code>, which will return a <code>Result&lt;Options, diana::errors::Error&gt;</code>. Because you can't do anything at all without the options defined properly, it's typical to run <code>.expect()</code> after this to <code>panic!</code> quickly if the configuration couldn't be built.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                                                    <a rel="prev" href="writing_schemas.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
                         
-                                                    <a rel="next" href="getting_started.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                                    <a rel="next" href="auth.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -167,8 +217,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                                    <a rel="prev" href="writing_schemas.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
                 
-                                    <a rel="next" href="getting_started.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                    <a rel="next" href="auth.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                             </nav>

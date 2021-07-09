@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Introduction - Diana Book</title>
+        <title>Writing Schemas - Diana Book</title>
                 
 
         <!-- Custom HTML head -->
@@ -82,7 +82,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="getting_started.html"><strong aria-hidden="true">2.</strong> Getting Started</a></li><li class="chapter-item expanded "><a href="writing_schemas.html"><strong aria-hidden="true">3.</strong> Writing Schemas</a></li><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="auth.html"><strong aria-hidden="true">5.</strong> Authentication</a></li><li class="chapter-item expanded "><a href="serverless.html"><strong aria-hidden="true">6.</strong> Going Serverless</a></li><li class="chapter-item expanded "><a href="core/getting_started.html"><strong aria-hidden="true">7.</strong> Core Library</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="core/queries_mutations.html"><strong aria-hidden="true">7.1.</strong> Handling Queries and Mutations</a></li><li class="chapter-item expanded "><a href="core/auth.html"><strong aria-hidden="true">7.2.</strong> Authentication</a></li></ol></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="getting_started.html"><strong aria-hidden="true">2.</strong> Getting Started</a></li><li class="chapter-item expanded "><a href="writing_schemas.html" class="active"><strong aria-hidden="true">3.</strong> Writing Schemas</a></li><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="auth.html"><strong aria-hidden="true">5.</strong> Authentication</a></li><li class="chapter-item expanded "><a href="serverless.html"><strong aria-hidden="true">6.</strong> Going Serverless</a></li><li class="chapter-item expanded "><a href="core/getting_started.html"><strong aria-hidden="true">7.</strong> Core Library</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="core/queries_mutations.html"><strong aria-hidden="true">7.1.</strong> Handling Queries and Mutations</a></li><li class="chapter-item expanded "><a href="core/auth.html"><strong aria-hidden="true">7.2.</strong> Authentication</a></li></ol></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -143,21 +143,77 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
-<p>Welcome to the Diana Book! Right now, this is still under construction, but check back soon for a full guide on how to use Diana!</p>
-<blockquote>
-<p><strong>Pragmatic GraphQL that just works.</strong></p>
-</blockquote>
-<p><a href="https://github.com/diana-graphql/diana">Diana</a> • <a href="https://crates.io/crates/diana">Crate Page</a> • <a href="https://docs.rs/diana">API Documentation</a> • <a href="./CONTRIBUTING.html">Contributing</a></p>
-<p>Welcome to the Diana book, the central location for all Diana documentation! This is designed to be read in order, but each page should also be self-containing for later reference. If you find an issue with this documentation or you'd like to contribute in any way to the project, please <a href="https://github.com/diana-graphql/diana/issues/new/choose">open an issue</a> and let us know!</p>
-<p>If you're looking for a more general overview of the project, please see the <a href="https://github.com/diana-graphql/diana">README</a>.</p>
+                        <h1 id="writing-schemas"><a class="header" href="#writing-schemas">Writing Schemas</a></h1>
+<p>The most critical part of GraphQL is schemas, and they're easily the most complex part of Diana. This page will explain how to write schemas that work with Diana, and it will explain how to get subscriptions to work properly, however it will not explain how to write basic schemas from scratch. For that, please refer to <a href="https://async-graphql.github.io">async_graphql's documentation</a>.</p>
+<h2 id="subscriptions"><a class="header" href="#subscriptions">Subscriptions</a></h2>
+<p>A basic Diana subscription would look something like this:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use diana::async_graphql::{Subscription as GQLSubscription, Context as GQLCtx};
+use diana::errors::GQLResult;
+use diana::stream;
+
+#[derive(Default, Clone)]
+pub struct Subscription;
+#[GQLSubscription]
+impl Subscription {
+    async fn new_blahs(
+        &amp;self,
+        raw_ctx: &amp;GQLCtx&lt;'_&gt;,
+    ) -&gt; impl Stream&lt;Item = GQLResult&lt;String&gt;&gt; {
+        let stream_result = get_stream_for_channel_from_ctx(&quot;channel_name&quot;, raw_ctx);
+
+        stream! {
+            let stream = stream_result?;
+            for await message in stream {
+                yield Ok(message);
+            }
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>All this does is sets up a subscription that will return the strings on a particular channel. And this shows perfectly how subscriptions in Diana work -- channels. You publish something on a channel from the queries/mutations system and then receive it as above. You can then use the re-exported <code>stream!</code> macro to return a stream for it.</p>
+<p>Note that if you're trying to send a struct across channels you'll need to serialize/deserialize it into/out of a string for transport. However, as subscriptions can return errors in their streams, this shouldn't be a problem!</p>
+<h2 id="mutations-that-link-with-subscriptions"><a class="header" href="#mutations-that-link-with-subscriptions">Mutations that link with subscriptions</a></h2>
+<p>The most common thing to trigger a subscription is some kind of mutation on the queries/mutations system, and so Diana provides a simple programmatic way of publishing data on a particular channel:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use diana::async_graphql::{Subscription as GQLSubscription, Context as GQLCtx};
+use diana::errors::GQLResult;
+use diana::stream;
+use diana::Publisher;
+
+#[derive(Default, Clone)]
+pub struct Mutation {}
+#[GQLObject]
+impl Mutation {
+    async fn update_blah(
+        &amp;self,
+        raw_ctx: &amp;async_graphql::Context&lt;'_&gt;,
+    ) -&gt; GQLResult&lt;bool&gt; {
+        let publisher = raw_ctx.data::&lt;Publisher&gt;()?;
+        publisher.publish(&quot;channel_name&quot;, &quot;important message&quot;).await?;
+        Ok(true)
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>In the above example, we get a <code>Publisher</code> out of the GraphQL context (it's automatically injected), and we use it to easily send a message to the subscriptions server on the <code>channel_name</code> channel. Our subscription from the previous example would pick this up and stream it to the client.</p>
+<h2 id="linking-other-services-to-subscriptions"><a class="header" href="#linking-other-services-to-subscriptions">Linking other services to subscriptions</a></h2>
+<p>Of course, it's entirely possible that services well beyond GraphQL may need to trigger a subscription message, and so you can easily push a message from anywhere where you can execute a basic HTTP request. Diana's subscriptions server has an inbuilt mutation <code>publish</code>, which takes a channel to publish on and a string message to publish. This can be called over a simple HTTP request from anywhere. However, this endpoint requires authentication, and you must have a valid JWT signed with the secret you've provided to be able to access it.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                                                    <a rel="prev" href="getting_started.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
                         
-                                                    <a rel="next" href="getting_started.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                                    <a rel="next" href="config.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -167,8 +223,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                                    <a rel="prev" href="getting_started.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
                 
-                                    <a rel="next" href="getting_started.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                    <a rel="next" href="config.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                             </nav>
