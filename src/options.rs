@@ -12,7 +12,7 @@ pub use crate::graphql::{SubscriptionsServerInformation, UserSchema};
 
 /// The options for creating the normal server, subscriptions server, and serverless function.
 /// You should define your options in one file and then import them everywhere you need them.
-/// You should use [`OptionsBuilder`] to construct this.
+/// You should use `::builder()` to construct this.
 #[derive(Clone)]
 pub struct Options<C, Q, M, S>
 where
@@ -41,6 +41,18 @@ where
     pub playground_endpoint: Option<String>,
     /// The GraphQL endpoint location. By default `/graphql`.
     pub graphql_endpoint: String,
+}
+impl<C, Q, M, S> Options<C, Q, M, S>
+where
+    C: Any + Send + Sync + Clone,
+    Q: Clone + ObjectType + 'static,
+    M: Clone + ObjectType + 'static,
+    S: Clone + SubscriptionType + 'static,
+{
+    /// Creates a new builder-style struct to create the and instance of [`Options`].
+    pub fn builder() -> OptionsBuilder<C, Q, M, S> {
+        OptionsBuilder::default()
+    }
 }
 
 /// A builder-style struct to create an instance of [`Options`] idiomatically.

@@ -1,5 +1,5 @@
 use async_graphql::{EmptyMutation, EmptySubscription, Object as GQLObject};
-use diana::{AuthBlockLevel, Options, OptionsBuilder};
+use diana::{AuthBlockLevel, Options};
 
 #[derive(Clone)]
 struct Context {
@@ -17,7 +17,7 @@ impl Query {
 
 #[test]
 fn returns_valid_options() {
-    let opts = OptionsBuilder::new()
+    let opts = Options::builder()
         .ctx(Context {
             prop: "connection".to_string(),
         })
@@ -38,7 +38,7 @@ fn returns_valid_options() {
 }
 #[test]
 fn returns_valid_options_without_subscriptions() {
-    let opts = OptionsBuilder::new()
+    let opts = Options::builder()
         .ctx(Context {
             prop: "connection".to_string(),
         })
@@ -55,7 +55,7 @@ fn returns_valid_options_without_subscriptions() {
 }
 #[test]
 fn uses_default_graphql_endpoint() {
-    let opts = OptionsBuilder::new()
+    let opts = Options::builder()
         .ctx(Context {
             prop: "connection".to_string(),
         })
@@ -77,7 +77,7 @@ fn uses_default_graphql_endpoint() {
 }
 #[test]
 fn uses_default_playground_endpoint() {
-    let opts = OptionsBuilder::new()
+    let opts = Options::builder()
         .ctx(Context {
             prop: "connection".to_string(),
         })
@@ -105,7 +105,7 @@ fn returns_error_on_playground_in_production() {}
 #[test]
 fn returns_error_on_missing_subscriptions_server_fields() {
     if matches!(
-        OptionsBuilder::new()
+        Options::builder()
             .ctx(Context {
                 prop: "connection".to_string(),
             })
@@ -124,7 +124,7 @@ fn returns_error_on_missing_subscriptions_server_fields() {
         panic!("Returned valid options instance, should've been invalid.")
     }
     if matches!(
-        OptionsBuilder::new()
+        Options::builder()
             .ctx(Context {
                 prop: "connection".to_string(),
             })
@@ -143,7 +143,7 @@ fn returns_error_on_missing_subscriptions_server_fields() {
         panic!("Returned valid options instance, should've been invalid.")
     }
     if matches!(
-        OptionsBuilder::new()
+        Options::builder()
             .ctx(Context {
                 prop: "connection".to_string(),
             })
@@ -162,7 +162,7 @@ fn returns_error_on_missing_subscriptions_server_fields() {
         panic!("Returned valid options instance, should've been invalid.")
     }
     if matches!(
-        OptionsBuilder::new()
+        Options::builder()
             .ctx(Context {
                 prop: "connection".to_string(),
             })
@@ -184,7 +184,7 @@ fn returns_error_on_missing_subscriptions_server_fields() {
 #[test]
 fn returns_error_on_missing_required_fields() {
     if matches!(
-        OptionsBuilder::<Context, Query, EmptyMutation, EmptySubscription>::new()
+        Options::<Context, Query, EmptyMutation, EmptySubscription>::builder()
             // .ctx(Context {
             //     prop: "connection".to_string(),
             // })
@@ -197,7 +197,7 @@ fn returns_error_on_missing_required_fields() {
         panic!("Returned valid options instance, should've been invalid.")
     }
     if matches!(
-        OptionsBuilder::new()
+        Options::builder()
             .ctx(Context {
                 prop: "connection".to_string(),
             })
@@ -210,7 +210,7 @@ fn returns_error_on_missing_required_fields() {
         panic!("Returned valid options instance, should've been invalid.")
     }
     if matches!(
-        OptionsBuilder::new()
+        Options::builder()
             .ctx(Context {
                 prop: "connection".to_string(),
             })
@@ -223,7 +223,7 @@ fn returns_error_on_missing_required_fields() {
         panic!("Returned valid options instance, should've been invalid.")
     }
     if matches!(
-        OptionsBuilder::<Context, Query, EmptyMutation, EmptySubscription>::new()
+        Options::<Context, Query, EmptyMutation, EmptySubscription>::builder()
             .ctx(Context {
                 prop: "connection".to_string(),
             })

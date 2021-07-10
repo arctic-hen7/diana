@@ -2,7 +2,7 @@
 // All examples import it dirtily by using the `include!` macro, which you should never use unless you have a very good reason to!
 
 use diana::{
-    Options, OptionsBuilder, AuthBlockLevel,
+    Options, AuthBlockLevel,
     async_graphql::{
         Object as GQLObject, Subscription as GQLSubscription,
         SimpleObject as GQLSimpleObject,
@@ -83,7 +83,7 @@ pub fn get_opts() -> Options<Context, Query, Mutation, Subscription> {
         dotenv::from_filename("examples/.env").expect("Failed to load environment variables!");
     }
 
-    OptionsBuilder::new()
+    Options::builder()
         .ctx(Context {
             pool: "connection".to_string(),
         })

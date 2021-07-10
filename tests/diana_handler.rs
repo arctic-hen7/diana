@@ -1,7 +1,7 @@
 use async_graphql::{EmptyMutation, EmptySubscription, Object as GQLObject};
 use diana::{
     create_jwt, decode_time_str, get_jwt_secret, AuthBlockLevel, AuthVerdict, DianaHandler,
-    DianaResponse, Options, OptionsBuilder, SysSchema,
+    DianaResponse, Options, SysSchema,
 };
 use std::collections::HashMap;
 
@@ -28,7 +28,7 @@ const SIMPLE_INVALID_QUERY_RES: &str = "{\"data\":null,\"errors\":[{\"message\":
 fn get_opts(
     auth_block_level: AuthBlockLevel,
 ) -> Options<Context, Query, EmptyMutation, EmptySubscription> {
-    OptionsBuilder::new()
+    Options::builder()
         .ctx(Context {
             prop: "connection".to_string(),
         })
@@ -82,7 +82,7 @@ fn returns_valid_handler() {
 }
 #[test]
 fn returns_valid_handler_with_no_subscriptions() {
-    let opts = OptionsBuilder::new()
+    let opts = Options::builder()
         .ctx(Context {
             prop: "connection".to_string(),
         })

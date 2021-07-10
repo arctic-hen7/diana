@@ -94,10 +94,10 @@ Hopefully you can see that our `Query` object is simply defining one query, `api
 
 ## Your first options
 
-Every part of Diana is configured using the `Options` struct, which can be created with `OptionsBuilder`. For now, we'll set up a simple configuration without any subscriptions support. Add this to your shared logic:
+Every part of Diana is configured using the `Options` struct, which can be created with `Options::builder()`. For now, we'll set up a simple configuration without any subscriptions support. Add this to your shared logic:
 
 ```rust
-use diana::{Options, OptionsBuilder, AuthBlockState};
+use diana::{Options, AuthBlockState};
 use diana::async_graphql::{EmptyMutation, EmptySubscription};
 use crate::Query; // Or wherever you put your `Query` object from the previous section
 
@@ -105,7 +105,7 @@ use crate::Query; // Or wherever you put your `Query` object from the previous s
 pub struct Context(String);
 
 pub fn get_opts() -> Options<Context, Query, EmptyMutation, EmptySubscription> {
-    OptionsBuilder::new()
+    Options::builder()
         .ctx(Context("test".to_string()))
         .auth_block_state(AuthBlockLevel::AllowAll)
         .jwt_secret("this is a secret")

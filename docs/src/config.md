@@ -3,7 +3,7 @@
 Diana is configured using the `Options` struct. This page will go through in detail what can be specified using that system. Here's an example options initialization that we'll work through:
 
 ```rust
-OptionsBuilder::new()
+Options::builder()
         .ctx(Context("test".to_string()))
         .subscriptions_server_hostname("http://localhost")
         .subscriptions_server_port("9002")
