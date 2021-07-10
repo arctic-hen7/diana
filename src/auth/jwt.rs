@@ -16,7 +16,7 @@ pub struct Claims {
 
 /// A parsed JWT secret. This should be created once with `get_jwt_secret` and then reused as much as possible. You may want to
 /// place it in your context under [`Options`](crate::Options).
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct JWTSecret<'a> {
     encoding_key: EncodingKey,
     decoding_key: DecodingKey<'a>,
