@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.4](https://github.com/diana-graphql/diana/compare/v0.2.3...v0.2.4) (2021-07-10)
+
+
+### Bug Fixes
+
+* 🚑 exposed hidden jwt types ([ff4a766](https://github.com/diana-graphql/diana/commit/ff4a76607184d11b47c2eb8c3ee06e5333b9dfa5))
+
+
+### Documentation Changes
+
+* **book:** 📝 updated book intro ([8234ff0](https://github.com/diana-graphql/diana/commit/8234ff00db4b1eec26d28482d883451a819b8b28))
+* **book:** 📝 updated book to require installation of `async_graphql` directly ([2577738](https://github.com/diana-graphql/diana/commit/2577738552be068abc5c5d5e8d2f57d43119465a))
+
 ### [0.2.3](https://github.com/diana-graphql/diana/compare/v0.2.2...v0.2.3) (2021-07-09)
 
 

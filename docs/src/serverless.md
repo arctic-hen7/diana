@@ -9,7 +9,7 @@ Crucially, **no part of your schemas or options** should have to change to go se
 First off, install `diana-aws-lambda` by adding the following to your `Cargo.toml` for the `serverless` crate under `[dependencies]` (notice that versions of integrations and the core library are kept in sync deliberately):
 
 ```toml
-diana-aws-lambda = "0.2.3"
+diana-aws-lambda = "0.2.4"
 ```
 
 ```rust

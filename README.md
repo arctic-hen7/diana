@@ -13,7 +13,7 @@ Diana's documentation can be found in [the book][book].
 Getting started with Diana is really easy! Just install it by adding this to your `Cargo.toml` file:
 
 ```
-diana = "0.2.3"
+diana = "0.2.4"
 ```
 
 Due to the complexity of its components, Diana does have a lot of dependencies, so you may want to go and have a cup of tea while you wait for the installation and everything to be compiled for the first time!
