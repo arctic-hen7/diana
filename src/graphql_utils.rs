@@ -58,7 +58,7 @@ macro_rules! if_authed(
             if $auth_state.has_claims(test_claims) {
                 $code
             } else {
-                $crate::errors::bail!($crate::errors::ErrorKind::Unauthorised)
+                Err($crate::errors::ErrorKind::Unauthorised.into())
             }
         }
      };

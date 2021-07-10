@@ -97,7 +97,7 @@ macro_rules! shutdown_all(
 async fn e2e() {
     // Get the configurations for the two servers
     let graphql_configurer =
-        create_graphql_server(get_opts()).expect("Failed to set up queries/mutationsconfigurer!");
+        create_graphql_server(get_opts()).expect("Failed to set up queries/mutations configurer!");
     let susbcriptions_configurer = create_subscriptions_server(get_opts())
         .expect("Failed to set up subscriptions configurer!");
 
