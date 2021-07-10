@@ -147,7 +147,7 @@
 <p>Diana is a high-level wrapper around <a href="https://crates.io/crates/async-graphql">async_graphql</a>, and is designed to be as easy as possible to get started with! This page is a basic tutorial of how to get started with a full and working setup.</p>
 <h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
 <p>Assuming you have Rust already installed (if not, <a href="https://www.rust-lang.org/tools/install">here's</a> a guide on how to do so), you can add Diana as a dependency to your project easily by adding the following to your project's <code>Cargo.toml</code> under <code>[dependencies]</code>:</p>
-<pre><code>diana = &quot;0.2.3&quot;
+<pre><code>diana = &quot;0.2.4&quot;
 async-graphql = &quot;2.8.2&quot;
 </code></pre>
 <p>We also install <code>async_graphql</code> directly to prevent errors with asynchronous usage. Now run <code>cargo build</code> to download all dependencies. Diana is large and complex, so this will take quite a while!</p>
@@ -240,7 +240,7 @@ pub fn get_opts() -&gt; Options&lt;Context, Query, EmptyMutation, EmptySubscript
 <p>Next, we define a function <code>get_opts()</code> that initializes our <code>Options</code>. We set the context, define our schema, and do two other things that need some explaining. The first is <code>.auth_block_state()</code>, which sets the required authentication level to access our GraphQL endpoint. Diana has authentication built-in, so this is fundamental. Here, we allow anything, authenticated or not, for educational purposes. In a production app, set this to block everything! You can read more about authentication <a href="./auth.html">here</a>. The second thing that needs explaining is <code>.jwt_secret()</code>. Diana's authentication systems is based on JWTs, which are basically tokens that clients send to servers to prove their identity (the server signed them earlier, and so can verify them). JWTs need a secret to be based on, and we define a very silly one here. In a production app, you should read this from an environment variable and it should be randomly generated (more on that <a href="./auth.html">here</a>).</p>
 <h2 id="your-first-server"><a class="header" href="#your-first-server">Your first server</a></h2>
 <p>Let's try plugging this into a basic Diana server! Diana is based around integrations for different platforms, and it currently supports only Actix Web for serverful systems, so that's what we'll use! You should add this to your <code>Cargo.toml</code> in the <code>server</code> crate under <code>[dependencies]</code>:</p>
-<pre><code class="language-toml">diana-actix-web = &quot;0.2.3&quot;
+<pre><code class="language-toml">diana-actix-web = &quot;0.2.4&quot;
 </code></pre>
 <p>Now add the following to your <code>main.rs</code> in the <code>server</code> crate:</p>
 <pre><pre class="playground"><code class="language-rust">use diana_actix_web::{
