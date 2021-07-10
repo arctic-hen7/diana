@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.5](https://github.com/diana-graphql/diana/compare/v0.2.4...v0.2.5) (2021-07-10)
+
+
+### Features
+
+* ✨ added `Options::builder()` method ([23454d9](https://github.com/diana-graphql/diana/commit/23454d922f21113facd0809e62dae4af765c9cc6)), closes [#1](https://github.com/diana-graphql/diana/issues/1)
+
+
+### Bug Fixes
+
+* 🚑 made `JWTSecret` `Clone`able ([61b8de6](https://github.com/diana-graphql/diana/commit/61b8de60f375e0821f5d9474202315e6233737d4))
+
 ### [0.2.4](https://github.com/diana-graphql/diana/compare/v0.2.3...v0.2.4) (2021-07-10)
 
 
