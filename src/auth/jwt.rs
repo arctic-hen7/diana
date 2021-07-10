@@ -5,13 +5,17 @@ use std::collections::HashMap;
 
 use crate::errors::*;
 
-// We make the claims very generic
+/// The claims made by a JWT, including metadata.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct Claims {
+    /// The expiry of the JWT as a datetime in seconds from Unix epoch.
     pub exp: u64,
-    pub claims: HashMap<String, String>, // The additional claims the user makes (as generic as possible)
+    /// The claims made by the user (non-metadata).
+    pub claims: HashMap<String, String>,
 }
 
+/// A parsed JWT secret. This should be created once with `get_jwt_secret` and then reused as much as possible. You may want to
+/// place it in your context under [`Options`](crate::Options).
 #[derive(Debug)]
 pub struct JWTSecret<'a> {
     encoding_key: EncodingKey,
