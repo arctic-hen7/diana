@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.6](https://github.com/diana-graphql/diana/compare/v0.2.5...v0.2.6) (2021-07-10)
+
+
+### Bug Fixes
+
+* 🐛 allowed `if_authed` to work regardless of return result ([9d2fe98](https://github.com/diana-graphql/diana/commit/9d2fe986af5d6f9614f7856c9fd3ee01bcaac2df))
+
+### [0.2.6](https://github.com/diana-graphql/diana/compare/v0.2.5...v0.2.6) (2021-07-10)
+
+
+### Bug Fixes
+
+* 🐛 allowed `if_authed` to work regardless of return result ([9d2fe98](https://github.com/diana-graphql/diana/commit/9d2fe986af5d6f9614f7856c9fd3ee01bcaac2df))
+
 ### [0.2.5](https://github.com/diana-graphql/diana/compare/v0.2.4...v0.2.5) (2021-07-10)
 
 

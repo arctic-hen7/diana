@@ -7,7 +7,7 @@ Diana is a high-level wrapper around [async_graphql](https://crates.io/crates/as
 Assuming you have Rust already installed (if not, [here's](https://www.rust-lang.org/tools/install) a guide on how to do so), you can add Diana as a dependency to your project easily by adding the following to your project's `Cargo.toml` under `[dependencies]`:
 
 ```
-diana = "0.2.5"
+diana = "0.2.6"
 async-graphql = "2.8.2"
 ```
 
@@ -124,7 +124,7 @@ Next, we define a function `get_opts()` that initializes our `Options`. We set t
 Let's try plugging this into a basic Diana server! Diana is based around integrations for different platforms, and it currently supports only Actix Web for serverful systems, so that's what we'll use! You should add this to your `Cargo.toml` in the `server` crate under `[dependencies]`:
 
 ```toml
-diana-actix-web = "0.2.5"
+diana-actix-web = "0.2.6"
 ```
 
 Now add the following to your `main.rs` in the `server` crate:
