@@ -1,7 +1,7 @@
 [package]
 name = "diana"
 description = "Diana is an out-of-the-box GraphQL system with full support for use as a serverless function, as well as commonly-used features like subscriptions and authentication."
-version = "0.2.7"
+version = "0.2.8"
 authors = ["arctic_hen7 <arctic_hen7@pm.me>"]
 edition = "2018"
 license = "MIT"

@@ -48,7 +48,7 @@ use crate::pubsub::PubSub;
 // TODO mark as deprecated
 #[macro_export]
 #[deprecated(
-    since = "0.2.7",
+    since = "0.2.8",
     note = "please use `is_authed!` instead, it exposes a boolean and lets you use your own error logic"
 )]
 macro_rules! if_authed(

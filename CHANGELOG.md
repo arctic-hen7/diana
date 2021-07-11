@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.8](https://github.com/diana-graphql/diana/compare/v0.2.7...v0.2.8) (2021-07-11)
+
+
+### Features
+
+* ✨ exposed auth types and added method to get token claims ([e9f66f5](https://github.com/diana-graphql/diana/commit/e9f66f51d8988ebba8cc7deeb139793286b20984))
+
 ### [0.2.7](https://github.com/diana-graphql/diana/compare/v0.2.6...v0.2.7) (2021-07-11)
 
 
