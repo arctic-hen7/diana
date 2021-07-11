@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.7](https://github.com/diana-graphql/diana/compare/v0.2.6...v0.2.7) (2021-07-11)
+
+
+### Features
+
+* 🗑 added `is_authed!` to replace `if_authed!` ([35e8a8f](https://github.com/diana-graphql/diana/commit/35e8a8fa872d1e2a624f95beb5c3c1caa1ca0d93))
+
 ### [0.2.6](https://github.com/diana-graphql/diana/compare/v0.2.5...v0.2.6) (2021-07-10)
 
 
