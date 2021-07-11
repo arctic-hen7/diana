@@ -144,7 +144,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="handling-queries-and-mutations"><a class="header" href="#handling-queries-and-mutations">Handling Queries and Mutations</a></h1>
-<p>The main struct you'll be dealing with here is <a href="https://docs.rs/diana/0.2.7/diana/struct.DianaHandler.html"><code>DianaHandler</code></a>, and the API documentation for Diana is your friend here.</p>
+<p>The main struct you'll be dealing with here is <a href="https://docs.rs/diana/0.2.8/diana/struct.DianaHandler.html"><code>DianaHandler</code></a>, and the API documentation for Diana is your friend here.</p>
 <p>You can create a new <code>DianaHandler</code> by running <code>DianaHandler::new()</code> and providing it the <code>Options</code> you're using for your setup. That will automatically create schemas internally for queries/mutation and subscriptions. The two are mutually exclusive.</p>
 <h2 id="running-a-request"><a class="header" href="#running-a-request">Running a request</a></h2>
 <p>There are two functions you can use for running queries and mutations: <code>.run_stateless_for_subscriptions()</code> and <code>.run_stateless_without_subscriptions()</code>. The first uses the schema for the subscriptions system, which would be used basically only for running the internally used <code>publish</code> mutation. The latter is used for running the user's queries. If you're building for an unsupported platform, you'll need to support both if you want to support subscriptions.</p>
