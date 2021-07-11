@@ -32,6 +32,7 @@ mod options;
 mod pubsub;
 
 // Public exports accessible from the root (everything the user will need)
+pub use crate::auth::auth_state::{AuthState, AuthToken};
 pub use crate::auth::core::{AuthBlockLevel, AuthVerdict};
 pub use crate::auth::jwt::{
     create_jwt, decode_time_str, get_jwt_secret, validate_and_decode_jwt, Claims, JWTSecret,
