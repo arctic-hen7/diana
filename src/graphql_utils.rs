@@ -45,7 +45,12 @@ use crate::pubsub::PubSub;
 ///
 /// # fn main() {}
 /// ```
+// TODO mark as deprecated
 #[macro_export]
+#[deprecated(
+    since = "0.2.7",
+    note = "please use `is_authed!` instead, it exposes a boolean and lets you use your own error logic"
+)]
 macro_rules! if_authed(
     ($auth_state:expr, { $($key:expr => $value:expr),+ }, $code:block) => {
         {
@@ -60,6 +65,61 @@ macro_rules! if_authed(
             } else {
                 Err($crate::errors::ErrorKind::Unauthorised.into())
             }
+        }
+     };
+);
+
+/// Checks to see if the given authentication state matches the series of given claims. This must be provided with the authentication state,
+/// a series of claims to check against. It will then return a boolean as to whether or not the user is authorized.
+/// This should be used instead of [`if_authed!`].
+/// # Example
+/// This is a simplified version of the internal logic that publishes data to the subscriptions server.
+/// ```
+/// use diana::{
+///     errors::{Result, GQLResult, bail, ErrorKind},
+///     graphql_utils::get_auth_data_from_ctx,
+///     async_graphql::{Object as GQLObject},
+///     is_authed,
+/// };
+///
+/// #[derive(Default, Clone)]
+/// pub struct PublishMutation;
+/// #[GQLObject]
+/// impl PublishMutation {
+///     async fn publish(
+///         &self,
+///         raw_ctx: &async_graphql::Context<'_>,
+///         channel: String,
+///         data: String,
+///     ) -> Result<bool> {
+///         if is_authed!(
+///             get_auth_data_from_ctx(raw_ctx)?,
+///             {
+///                 "role" => "graphql_server"
+///             }
+///         ) {
+///             // Your code here
+///             Ok(true)
+///         } else {
+///             // Your error handling code here
+///             bail!(ErrorKind::Unauthorised)
+///         }
+///     }
+/// }
+///
+/// # fn main() {}
+/// ```
+#[macro_export]
+macro_rules! is_authed(
+    ($auth_state:expr, { $($key:expr => $value:expr),+ }) => {
+        {
+            // Create a HashMap out of the given test claims
+            let mut test_claims: ::std::collections::HashMap<&str, &str> = ::std::collections::HashMap::new();
+            $(
+                test_claims.insert($key, $value);
+            )+
+            // Match the authentication state with those claims now
+            $auth_state.has_claims(test_claims)
         }
      };
 );

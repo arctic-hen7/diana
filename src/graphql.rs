@@ -4,7 +4,7 @@ use std::sync::Mutex;
 
 use crate::errors::*;
 use crate::graphql_utils::{get_auth_data_from_ctx, get_pubsub_from_ctx};
-use crate::if_authed;
+use crate::is_authed;
 use crate::pubsub::{PubSub, Publisher};
 
 // The base query type simply allows us to set up the subscriptions schema (has to have at least one query)
@@ -34,19 +34,18 @@ impl PublishMutation {
         channel: String,
         data: String,
     ) -> Result<bool> {
-        // If this function needs to throw an error, we use a custom one since we're in a resolver
-        let auth_state = get_auth_data_from_ctx(raw_ctx)?;
-        if_authed!(
-            auth_state,
+        if is_authed!(
+            get_auth_data_from_ctx(raw_ctx)?,
             {
                 "role" => "graphql_server"
-            },
-            {
-                let mut pubsub = get_pubsub_from_ctx(raw_ctx)?;
-                pubsub.publish(&channel, data);
-                Ok(true)
             }
-        )
+        ) {
+            let mut pubsub = get_pubsub_from_ctx(raw_ctx)?;
+            pubsub.publish(&channel, data);
+            Ok(true)
+        } else {
+            bail!(ErrorKind::Unauthorised)
+        }
     }
 }
 
