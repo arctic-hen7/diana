@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.9](https://github.com/arctic-hen7/diana/compare/v0.2.8...v0.2.9) (2021-08-03)
+
+
+### Bug Fixes
+
+* **docs:** ✏️ fixed typo book links ([6e2f9f0](https://github.com/arctic-hen7/diana/commit/6e2f9f000625f903a07c8696c25dde5c9ad6cb9d))
+
 ### [0.2.8](https://github.com/diana-graphql/diana/compare/v0.2.7...v0.2.8) (2021-07-11)
 
 
