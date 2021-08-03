@@ -16,7 +16,7 @@ In development, Diana supports setting up one server for queries/mutations and a
 you just change one file!
 
 This documentation does not contain examples, which can be found in the [GitHub repository](https://github.com/arctic-hen7/diana). More
-detailed explanations and tutorials can be found in the [book](https://arctic-hen7.github.io).
+detailed explanations and tutorials can be found in the [book](https://arctic-hen7.github.io/diana).
 */
 
 mod auth;

@@ -55,7 +55,7 @@ If you want to make a contribution to Diana, that's great! Thanks so much! Contr
 
 See [`LICENSE`](./LICENSE).
 
-[book]: https://arctic-hen7.github.io
+[book]: https://arctic-hen7.github.io/diana
 [crate]: https://crates.io/crates/diana
 [docs]: https://docs.rs/diana
 [contrib]: ./CONTRIBUTING.md

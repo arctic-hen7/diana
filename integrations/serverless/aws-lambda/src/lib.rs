@@ -2,9 +2,9 @@
 #![deny(missing_docs)]
 
 /*!
-This is [Diana's](https://arctic-hen7.github.io) integration crate for AWS Lambda and its derivatives (like Netlify), which enables the
+This is [Diana's](https://arctic-hen7.github.io/diana) integration crate for AWS Lambda and its derivatives (like Netlify), which enables the
 easy deployment of a Diana system on those platforms. For more information, see
-[the documentation for Diana](https://github.com/arctic-hen7/diana) and [the book](https://arctic-hen7.github.io).
+[the documentation for Diana](https://github.com/arctic-hen7/diana) and [the book](https://arctic-hen7.github.io/diana).
 
 This crate can be used to create handlers for AWS Lambda itself, or any system that wraps it, like Netlify. Handlers created with this crate
 will compile, but will not run without being deployed fully. In development, you should use something like Actix Web (and
