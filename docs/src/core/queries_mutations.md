@@ -1,6 +1,6 @@
 # Handling Queries and Mutations
 
-The main struct you'll be dealing with here is [`DianaHandler`](https://docs.rs/diana/0.2.8/diana/struct.DianaHandler.html), and the API documentation for Diana is your friend here.
+The main struct you'll be dealing with here is [`DianaHandler`](https://docs.rs/diana/0.2.9/diana/struct.DianaHandler.html), and the API documentation for Diana is your friend here.
 
 You can create a new `DianaHandler` by running `DianaHandler::new()` and providing it the `Options` you're using for your setup. That will automatically create schemas internally for queries/mutation and subscriptions. The two are mutually exclusive.
 

@@ -15,8 +15,8 @@ for you, exposing a simple, automatically authenticated publishing API.
 In development, Diana supports setting up one server for queries/mutations and another for subscriptions. When it comes time to go serverless,
 you just change one file!
 
-This documentation does not contain examples, which can be found in the [GitHub repository](https://github.com/diana-graphql/diana). More
-detailed explanations and tutorials can be found in the [book](https://diana-graphql.github.io).
+This documentation does not contain examples, which can be found in the [GitHub repository](https://github.com/arctic-hen7/diana). More
+detailed explanations and tutorials can be found in the [book](https://arctic-hen7.github.io).
 */
 
 mod auth;

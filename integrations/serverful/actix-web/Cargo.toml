@@ -1,12 +1,12 @@
 [package]
 name = "diana-actix-web"
 description = "The integration between Diana GraphQL and Actix Web."
-version = "0.2.8"
+version = "0.2.9"
 authors = ["arctic_hen7 <arctic_hen7@pm.me>"]
 edition = "2018"
 license = "MIT"
-repository = "https://github.com/diana-graphql/diana"
-homepage = "https://diana-graphql.github.io"
+repository = "https://github.com/arctic-hen7/diana"
+homepage = "https://arctic-hen7.github.io"
 keywords = ["graphql", "serverless", "authentication"]
 categories = ["web-programming", "web-programming::http-server", "web-programming::websocket"]
 include = [
@@ -17,7 +17,7 @@ include = [
 ]
 
 [dependencies]
-diana = { path = "../../../", version = "=0.2.8" }
+diana = { path = "../../../", version = "=0.2.9" }
 serde = "1.0.103"
 serde_json = "1.0.44"
 futures = "0.3.14"
